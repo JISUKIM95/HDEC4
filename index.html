@@ -1,0 +1,976 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>현장 실적 시뮬레이터</title>
+  <style>
+    @font-face {
+      font-family: "HyundaiHarmonyL";
+      src: url("https://cdn.jsdelivr.net/gh/webfontworld/hyundai/HyundaiSansHeadKROTF-Light.woff2") format("woff2"),
+           url("https://cdn.jsdelivr.net/gh/webfontworld/hyundai/HyundaiSansHeadKROTF-Light.woff") format("woff");
+      font-weight: 300; font-style: normal;
+    }
+    @font-face {
+      font-family: "HyundaiHarmonyL";
+      src: url("https://cdn.jsdelivr.net/gh/webfontworld/hyundai/HyundaiSansHeadKROTF-Regular.woff2") format("woff2"),
+           url("https://cdn.jsdelivr.net/gh/webfontworld/hyundai/HyundaiSansHeadKROTF-Regular.woff") format("woff");
+      font-weight: 400; font-style: normal;
+    }
+    @font-face {
+      font-family: "HyundaiHarmonyL";
+      src: url("https://cdn.jsdelivr.net/gh/webfontworld/hyundai/HyundaiSansHeadKROTF-Medium.woff2") format("woff2"),
+           url("https://cdn.jsdelivr.net/gh/webfontworld/hyundai/HyundaiSansHeadKROTF-Medium.woff") format("woff");
+      font-weight: 500; font-style: normal;
+    }
+    @font-face {
+      font-family: "HyundaiHarmonyL";
+      src: url("https://cdn.jsdelivr.net/gh/webfontworld/hyundai/HyundaiSansHeadKROTF-Bold.woff2") format("woff2"),
+           url("https://cdn.jsdelivr.net/gh/webfontworld/hyundai/HyundaiSansHeadKROTF-Bold.woff") format("woff");
+      font-weight: 700; font-style: normal;
+    }
+
+    :root {
+      --primary:      #007A6E;
+      --primary-dark: #005C52;
+      --primary-light:#E6F4F2;
+      --teal:         #00A896;
+      --teal-light:   #CCEFEC;
+      --bg:           #F2F7F6;
+      --card:         #FFFFFF;
+      --text:         #1A2E2C;
+      --muted:        #5A7472;
+      --border:       #C8DDD9;
+      --border-light: #E4EFED;
+      --danger:       #D93B3B;
+      --danger-light: #FEF0F0;
+      --success:      #1A8C5E;
+      --success-light:#E6F7F0;
+      --radius-card:  18px;
+      --radius-input: 12px;
+      --radius-pill:  50px;
+      --shadow-card:  0 4px 16px rgba(0,122,110,0.08), 0 1px 4px rgba(0,0,0,0.04);
+      --shadow-hover: 0 8px 24px rgba(0,122,110,0.14), 0 2px 6px rgba(0,0,0,0.06);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: Arial, "KoreanOnly", sans-serif;
+      line-height: 1.55; padding: 20px 16px 40px;
+    }
+    /* 한글 영역만 HyundaiHarmonyL 적용, 영문·숫자·기호는 Arial 우선 */
+    :lang(ko), body { unicode-bidi: normal; }
+    *:not(input):not(select) {
+      font-family: Arial, "KoreanOnly", sans-serif;
+    }
+    /* 한글 문자에만 HyundaiHarmonyL 덮어쓰기 */
+    @font-face {
+      font-family: "KoreanOnly";
+      src: url("https://cdn.jsdelivr.net/gh/webfontworld/hyundai/HyundaiSansHeadKROTF-Regular.woff2") format("woff2");
+      font-weight: 400;
+      unicode-range: U+AC00-D7A3, U+1100-11FF, U+3130-318F, U+A960-A97F, U+D7B0-D7FF;
+    }
+    @font-face {
+      font-family: "KoreanOnly";
+      src: url("https://cdn.jsdelivr.net/gh/webfontworld/hyundai/HyundaiSansHeadKROTF-Bold.woff2") format("woff2");
+      font-weight: 700;
+      unicode-range: U+AC00-D7A3, U+1100-11FF, U+3130-318F, U+A960-A97F, U+D7B0-D7FF;
+    }
+    @font-face {
+      font-family: "KoreanOnly";
+      src: url("https://cdn.jsdelivr.net/gh/webfontworld/hyundai/HyundaiSansHeadKROTF-Medium.woff2") format("woff2");
+      font-weight: 500;
+      unicode-range: U+AC00-D7A3, U+1100-11FF, U+3130-318F, U+A960-A97F, U+D7B0-D7FF;
+    }
+    body, button, label, span, td, th, div, p, h1, h2, h3, select, textarea {
+      font-family: "KoreanOnly", Arial, sans-serif;
+    }
+    input {
+      font-family: Arial, "KoreanOnly", sans-serif;
+    }
+    .container { max-width: 1100px; margin: 0 auto; }
+
+    /* HEADER */
+    header {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, var(--teal) 100%);
+      border-radius: var(--radius-card); padding: 22px 28px; margin-bottom: 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 6px 24px rgba(0,90,82,0.22);
+    }
+    .header-left h1 { font-size: 19px; font-weight: 700; color: #fff; margin: 0; }
+    .header-left .desc { font-size: 12.5px; color: rgba(255,255,255,0.78); margin-top: 4px; }
+    .badge {
+      font-family: Arial, sans-serif; font-size: 11px; font-weight: 700;
+      padding: 5px 13px; background: rgba(255,255,255,0.18);
+      border: 1.5px solid rgba(255,255,255,0.35);
+      border-radius: var(--radius-pill); color: #fff;
+    }
+
+    /* LAYOUT */
+    .layout {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 16px; align-items: start;
+    }
+    @media (max-width: 840px) { .layout { grid-template-columns: 1fr; } }
+
+    /* CARD */
+    .card {
+      background: var(--card); border-radius: var(--radius-card);
+      padding: 22px 20px; border: 1.5px solid var(--border-light);
+      box-shadow: var(--shadow-card); transition: box-shadow .2s;
+    }
+    .card:hover { box-shadow: var(--shadow-hover); }
+    .card-input  { border-top: 4px solid var(--teal); }
+    .card-result { border-top: 4px solid var(--primary); }
+
+    /* CARD TITLE */
+    .card-title {
+      font-size: 15px; font-weight: 700; margin-bottom: 16px;
+      color: #fff; padding: 9px 16px;
+      background: linear-gradient(135deg, var(--primary-dark), var(--teal));
+      border-radius: 10px; display: block;
+      letter-spacing: -0.2px;
+    }
+
+    /* FIELDS */
+    .field { margin-bottom: 11px; }
+    label {
+      display: block; font-size: 12.5px; font-weight: 700;
+      color: var(--muted); margin-bottom: 4px;
+    }
+    .badge-tag {
+      font-size: 10px; font-weight: 700; padding: 1px 7px;
+      border-radius: 20px; margin-left: 5px; vertical-align: middle;
+    }
+    .badge-input { background: #fff0f0; color: var(--danger); }
+    .badge-auto  { background: var(--teal-light); color: var(--teal); }
+
+    .input-row { position: relative; display: flex; align-items: center; }
+    input, select {
+      width: 100%; padding: 9px 12px 9px 10px;
+      border: 1.5px solid var(--border); border-radius: var(--radius-input);
+      font-size: 14px; text-align: right; outline: none;
+      font-family: Arial, "KoreanOnly", sans-serif;
+      color: var(--text); background: #fff;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    select { text-align: left; padding-left: 12px; font-family: "KoreanOnly", Arial, sans-serif; font-size: 13px; cursor: pointer; }
+    input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px var(--teal-light); }
+    input::placeholder { color: #b0c4c2; }
+    .unit { position: absolute; left: 11px; font-size: 11px; color: var(--muted); pointer-events: none; }
+    .input-row .unit + input { padding-left: 30px; }
+
+    /* 자동산출 필드 */
+    input.auto {
+      background: var(--primary-light); border-color: var(--teal-light);
+      color: var(--primary); font-weight: 700; cursor: default;
+    }
+    input.auto:focus { box-shadow: none; border-color: var(--teal-light); }
+
+    /* 구분선 */
+    .divider { border: none; border-top: 1.5px solid var(--border-light); margin: 14px 0; }
+    .sec-label {
+      font-size: 11px; font-weight: 700; color: var(--primary);
+      background: var(--primary-light); padding: 3px 10px;
+      border-radius: var(--radius-pill); display: inline-block; margin-bottom: 10px;
+    }
+
+    /* ── 결과 테이블 ── */
+    .res-wrap { overflow-x: auto; }
+    table.res {
+      width: 100%; border-collapse: collapse; font-size: 13px;
+    }
+    table.res th {
+      font-size: 11px; font-weight: 700; color: var(--muted);
+      padding: 6px 10px; text-align: right; border-bottom: 2px solid var(--border);
+      white-space: nowrap;
+    }
+    table.res th:first-child { text-align: left; min-width: 110px; }
+    table.res td {
+      padding: 7px 10px; text-align: right; border-bottom: 1px solid var(--border-light);
+      font-family: Arial, sans-serif; white-space: nowrap;
+    }
+    table.res td:first-child {
+      text-align: left; font-family: "KoreanOnly", Arial, sans-serif;
+      font-size: 12.5px; color: var(--muted);
+    }
+    /* 행 유형 */
+    table.res tr.r-main td { font-weight: 700; color: var(--text); font-size: 13.5px; }
+    table.res tr.r-sub td:first-child { padding-left: 22px; font-size: 12px; }
+    table.res tr.r-sub td:first-child::before { content: '└ '; color: var(--border); }
+    table.res tr.r-total { border-top: 2px solid var(--border); }
+    table.res tr.r-total td { font-weight: 700; font-size: 14px; }
+    table.res tr.r-rate td { font-size: 12px; color: var(--muted); }
+    table.res tr.r-rate td:first-child { padding-left: 22px; }
+
+    /* 컬럼 색상 */
+    .th-cum  { color: var(--primary) !important; }
+    .th-prev { color: #888 !important; }
+    .th-cur  { color: var(--teal) !important; }
+
+    /* 값 색상 */
+    .pos { color: var(--success) !important; font-weight: 700; }
+    .neg { color: var(--danger)  !important; font-weight: 700; }
+
+    /* POC */
+    .poc-row {
+      background: var(--primary-light); border-radius: 14px;
+      padding: 12px 16px; margin: 0 0 8px;
+      display: flex; justify-content: space-between; align-items: center;
+      border: 1.5px solid var(--teal-light);
+    }
+    .poc-label { font-size: 13px; font-weight: 700; color: var(--primary); }
+    .poc-val   { font-size: 22px; font-weight: 700; color: var(--primary); font-family: Arial, sans-serif; }
+
+    /* EAC */
+    .eac-block {
+      margin-top: 0; padding: 13px 16px;
+      background: transparent; border-radius: 0;
+      border: none; border-top: 1px solid var(--border-light);
+      border-bottom: 1px solid var(--border-light);
+    }
+    .eac-title { font-size: 12px; font-weight: 700; color: var(--primary); margin-bottom: 8px; }
+    .eac-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px dashed var(--border-light); font-size: 12.5px; }
+    .eac-row:last-child { border-bottom: none; }
+    .eac-label { color: var(--muted); }
+    .eac-val   { font-family: Arial, sans-serif; font-weight: 600; color: var(--text); }
+    .eac-row.eac-main .eac-label { font-weight: 700; color: var(--primary); }
+    .eac-row.eac-main .eac-val   { font-weight: 700; color: var(--primary); font-size: 14px; }
+    .eac-sub .eac-label { padding-left: 12px; font-size: 12px; }
+    .eac-sub .eac-label::before { content: '└ '; color: var(--border); }
+
+    /* 손실충당금 */
+    .loss-block {
+      display: none; margin-top: 12px;
+      background: var(--danger-light); border-radius: 14px;
+      padding: 13px 16px; border: 1.5px solid #f5c6c6;
+    }
+    .loss-title { font-size: 12px; font-weight: 700; color: var(--danger); margin-bottom: 8px; }
+    .loss-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid rgba(217,59,59,0.12); font-size: 12.5px; }
+    .loss-row:last-of-type { border-bottom: none; }
+    .loss-label { color: var(--danger); }
+    .loss-label.b { font-weight: 700; }
+    .loss-val { font-family: Arial, sans-serif; font-weight: 700; color: var(--danger); }
+
+    /* alert */
+    .alert { margin-top: 12px; padding: 10px 14px; border-radius: 12px; font-size: 12px; display: none; line-height: 1.5; }
+    .alert.warn { background: var(--danger-light); color: var(--danger); border: 1.5px solid #f5c6c6; display: block; }
+    .alert.info { background: var(--success-light); color: var(--success); border: 1.5px solid #b2dfc9; display: block; }
+
+    /* 하이라이트 */
+    .field-highlight {
+      background: #ffec6e;
+      border-radius: var(--radius-input);
+      transition: background .2s;
+    }
+    [data-needs] { transition: background .15s; }
+    [data-needs]:hover { background: var(--teal-light); border-radius: 6px; }
+
+    /* 주석 */
+    .note { margin-top: 16px; font-size: 11px; color: #8AACAA; line-height: 1.85; }
+
+    /* footer */
+    .footer { margin-top: 18px; font-size: 11px; color: var(--muted); text-align: center; border-top: 1px solid var(--border-light); padding-top: 12px; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="header-left">
+      <h1>🏗️ 현장 실적 시뮬레이터</h1>
+      <div class="desc">진행률 기반 매출 · 매출이익 산출</div>
+    </div>
+    <div class="badge">v6.0</div>
+  </header>
+
+  <div style="font-size:11.5px;color:var(--muted);padding:8px 14px;margin-bottom:12px;background:var(--bg);border-radius:10px;">
+    ※ 본 시뮬레이터는 IFRS 제1115호에 따라 진행률 기준 매출 인식을 적용합니다.
+  </div>
+
+  <div class="layout">
+
+    <!-- ── 입력 카드 ── -->
+    <div class="card card-input">
+      <span class="card-title">현장 목표 원가율 입력</span>
+
+      <!-- 도급금액 -->
+      <div class="field" data-lbl="A">
+        <label><b style="color:var(--teal);">A</b> &nbsp;총 도급금액 (VAT별도)</label>
+        <div class="input-row">
+          <span class="unit">원</span>
+          <input type="text" id="contract" placeholder="0" oninput="fmt(this);calc()">
+        </div>
+      </div>
+
+      <hr class="divider">
+      <div class="sec-label">목표 원가율 설정</div>
+
+      <!-- 매출원가율 (입력) -->
+      <div class="field">
+        <label>매출원가율 (%)<span class="badge-tag badge-input">직접 입력</span></label>
+        <div class="input-row">
+          <span class="unit">%</span>
+          <input type="number" id="totalR" value="93.02" step="0.01" oninput="calc()">
+        </div>
+      </div>
+
+      <!-- 하자보수비율 -->
+      <div class="field" data-lbl="B">
+        <label><b style="color:var(--teal);">B</b> &nbsp;하자보수비율</label>
+        <select id="defectR" onchange="calc()">
+          <option value="0.23">0.23% (토목)</option>
+          <option value="0.46">0.46% (주거 外)</option>
+          <option value="0.72" selected>0.72% (주거)</option>
+          <option value="0.77">0.77% (주거/25년기준)</option>
+          <option value="0.16">0.16% (플랜트)</option>
+          <option value="0.56">0.56% (발전)</option>
+          <option value="0.21">0.21% (원자력)</option>
+          <option value="0.09">0.09% (송변전)</option>
+        </select>
+      </div>
+
+      <!-- 금융비용율 -->
+      <div class="field" data-lbl="C">
+        <label><b style="color:var(--teal);">C</b> &nbsp;금융비용 (%)</label>
+        <div class="input-row">
+          <span class="unit">%</span>
+          <input type="number" id="etcTotalR" value="0.3" step="0.01" oninput="calc()">
+        </div>
+      </div>
+
+      <!-- 공사원가율 (자동) -->
+      <div class="field" data-lbl="D">
+        <label><b style="color:var(--teal);">D</b> &nbsp;공사원가율 (%) <span style="font-weight:400;color:#9ab;">(하자, 금융비용 제외)</span><span class="badge-tag badge-auto">자동 산출</span></label>
+        <div class="input-row">
+          <span class="unit">%</span>
+          <input type="text" id="constR_disp" class="auto" readonly tabindex="-1">
+        </div>
+      </div>
+
+      <hr class="divider">
+      <div class="sec-label">당월말 실적</div>
+
+      <!-- 당월말 누적 공사원가 -->
+      <div class="field" data-lbl="E">
+        <label style="color:var(--primary);"><b style="color:var(--teal);">E</b> &nbsp;당월말 누적 공사원가</label>
+        <div class="input-row">
+          <span class="unit">원</span>
+          <input type="text" id="actualC" placeholder="0" oninput="fmt(this);calc()">
+        </div>
+      </div>
+
+      <!-- 착공 전 금융비용 -->
+      <div class="field">
+        <label>착공 전 금융비용 (원)</label>
+        <div class="input-row">
+          <span class="unit">원</span>
+          <input type="text" id="etcPreAmt" placeholder="0" oninput="fmt(this);calc()">
+        </div>
+      </div>
+
+      <!-- 착공 후 금융비용 -->
+      <div class="field">
+        <label>착공 후 금융비용 (당월말 누계)</label>
+        <div class="input-row">
+          <span class="unit">원</span>
+          <input type="text" id="etcPostAmt" placeholder="0" oninput="fmt(this);calc()">
+        </div>
+      </div>
+
+      <hr class="divider">
+      <div class="sec-label">전월말 실적</div>
+
+      <!-- 전월말 누계 매출 -->
+      <div class="field">
+        <label>전월말 누계 매출액</label>
+        <div class="input-row">
+          <span class="unit">원</span>
+          <input type="text" id="prevRev" placeholder="0" oninput="fmt(this);calc()">
+        </div>
+      </div>
+
+      <!-- 전월말 누계 원가 -->
+      <div class="field">
+        <label>전월말 누계 원가 <span style="font-weight:400;color:#9ab;">(하자보수비, 금융비용 포함)</span></label>
+        <div class="input-row">
+          <span class="unit">원</span>
+          <input type="text" id="prevCost" placeholder="0" oninput="fmt(this);calc()">
+        </div>
+      </div>
+
+    </div><!-- /입력 카드 -->
+
+    <!-- ── 결과 카드 ── -->
+    <div class="card card-result">
+      <span class="card-title">실적 추정 결과</span>
+
+      <!-- ① 당월말 진행률 -->
+      <div class="poc-row" data-lbl="G" style="margin-bottom:8px;align-items:flex-start;">
+        <span class="poc-label">① 당월말 진행률 (G)
+          <span style="display:block;font-size:11px;font-weight:400;color:var(--muted);margin-top:3px;">
+            = 당월말 누적 공사원가 <span id="desc_actual"></span> (<b style="color:var(--primary);">E</b>)<br>
+            ÷ 총예정공사원가 = A×D <span id="desc_eac_const"></span> (<b style="color:var(--primary);">F</b>)
+          </span>
+        </span>
+        <span class="poc-val" id="poc" style="min-width:80px;text-align:right;">0.00%</span>
+      </div>
+
+      <!-- EAC (① 과 ② 사이) -->
+      <div class="eac-block" style="margin-bottom:8px;">
+        <div class="eac-title">📋 총 예정원가 (EAC)</div>
+        <div class="eac-row eac-main">
+          <span class="eac-label">합계</span>
+          <span class="eac-val" id="eac">—</span>
+        </div>
+        <div class="eac-row eac-sub" data-needs="A,D" style="cursor:pointer;">
+          <span class="eac-label">공사원가 <span id="desc_eac_const_formula" style="font-size:10px;color:var(--muted);font-weight:400;"></span> (<b style="color:var(--primary);">A×D = F</b>)</span>
+          <span class="eac-val" id="eac_const">—</span>
+        </div>
+        <div class="eac-row eac-sub" data-needs="A,B" style="cursor:pointer;">
+          <span class="eac-label">하자보수비 <span id="desc_eac_defect_formula" style="font-size:10px;color:var(--muted);font-weight:400;"></span> (<b style="color:var(--primary);">A×B</b>)</span>
+          <span class="eac-val" id="eac_defect">—</span>
+        </div>
+        <div class="eac-row eac-sub" data-needs="A,C" style="cursor:pointer;">
+          <span class="eac-label">금융비용 <span id="desc_eac_etc_formula" style="font-size:10px;color:var(--muted);font-weight:400;"></span> (<b style="color:var(--primary);">A×C</b>)</span>
+          <span class="eac-val" id="eac_etc">—</span>
+        </div>
+        <div class="eac-row eac-main" style="margin-top:6px;border-top:1px solid var(--border-light);padding-top:6px;">
+          <span class="eac-label">최종 매출원가율</span>
+          <span class="eac-val" id="finalR">—</span>
+        </div>
+      </div>
+
+      <!-- ② 당월말 매출 -->
+      <div class="poc-row" style="margin-bottom:14px;align-items:flex-start;">
+        <span class="poc-label">② 당월말 매출
+          <span style="display:block;font-size:11px;font-weight:400;color:var(--muted);margin-top:3px;">
+            = 계약고 <span id="desc_contract"></span> (<b>A</b>) × 당월말 진행률 (<b>G</b>)
+          </span>
+        </span>
+        <span class="poc-val" id="cum_rev_summary" style="font-size:18px;min-width:80px;text-align:right;">—</span>
+      </div>
+
+      <!-- 손익 테이블 -->
+      <div class="res-wrap">
+        <table class="res">
+          <thead>
+            <tr>
+              <th></th>
+              <th class="th-cum">당월말 누계</th>
+              <th style="color:#aaa;font-size:11px;padding:6px 4px;">−</th>
+              <th class="th-prev">전월말 누계</th>
+              <th style="color:#aaa;font-size:11px;padding:6px 4px;">=</th>
+              <th class="th-cur">당월</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="r-main">
+              <td>매출액</td>
+              <td id="cum_rev">—</td>
+              <td></td>
+              <td id="prev_rev">—</td>
+              <td></td>
+              <td id="cur_rev">—</td>
+            </tr>
+            <tr class="r-main">
+              <td>매출원가</td>
+              <td id="cum_cost">—</td>
+              <td></td>
+              <td id="prev_cost">—</td>
+              <td></td>
+              <td id="cur_cost">—</td>
+            </tr>
+            <tr class="r-sub" data-needs="A,D,G" style="cursor:pointer;">
+              <td>공사원가 <span style="font-size:10px;color:var(--muted);font-weight:400;">(F×G)</span></td>
+              <td id="cum_const">—</td>
+              <td></td>
+              <td>—</td>
+              <td></td>
+              <td id="cur_const">—</td>
+            </tr>
+            <tr class="r-sub" data-needs="A,B,G" style="cursor:pointer;">
+              <td>하자보수비 <span style="font-size:10px;color:var(--muted);font-weight:400;">(A×B×G)</span></td>
+              <td id="cum_defect">—</td>
+              <td></td>
+              <td>—</td>
+              <td></td>
+              <td id="cur_defect">—</td>
+            </tr>
+            <tr class="r-sub" data-needs="A,C,G" style="cursor:pointer;">
+              <td>착공 전 금융비용 <span style="font-size:10px;color:var(--muted);font-weight:400;">(A×C×G)</span></td>
+              <td id="cum_etcPre">—</td>
+              <td></td>
+              <td>—</td>
+              <td></td>
+              <td id="cur_etcPre">—</td>
+            </tr>
+            <tr class="r-sub">
+              <td>착공 후 금융비용 (당월말 누계)</td>
+              <td id="cum_etcPost">—</td>
+              <td></td>
+              <td>—</td>
+              <td></td>
+              <td id="cur_etcPost">—</td>
+            </tr>
+            <tr class="r-sub" id="row_loss" style="display:none;">
+              <td style="color:var(--danger);">공사손실충당금 <span style="font-size:10px;font-weight:400;">(잔액)</span></td>
+              <td id="cum_loss" style="color:var(--danger);">—</td>
+              <td></td>
+              <td style="color:var(--muted);">—</td>
+              <td></td>
+              <td id="cur_loss" style="color:var(--danger);">—</td>
+            </tr>
+            <tr class="r-total">
+              <td>매출이익</td>
+              <td id="cum_profit">—</td>
+              <td></td>
+              <td id="prev_profit">—</td>
+              <td></td>
+              <td id="cur_profit">—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 손실충당금 -->
+      <div id="lossSection" class="loss-block">
+        <div class="loss-title">⚠️ 공사손실충당금</div>
+        <div class="loss-row"><span class="loss-label b">총액</span><span class="loss-val" id="lossTotal">—</span></div>
+        <div class="loss-row"><span class="loss-label">기인식분</span><span class="loss-val" id="lossRec">—</span></div>
+        <div class="loss-row"><span class="loss-label b">잔액</span><span class="loss-val" id="lossAmt">—</span></div>
+        <p style="font-size:11px;color:var(--danger);opacity:.75;margin:6px 0 0;">
+          * 총예정원가가 도급액을 초과하여 미진행분에 대한 손실을 즉시 인식합니다.
+        </p>
+      </div>
+
+      <div id="msg" class="alert"></div>
+
+      <div class="note">
+        ※ 손실충당금 잔액 = (총예정원가 − 도급금액) × (1 − 진행률)
+      </div>
+    </div><!-- /결과 카드 -->
+
+  </div><!-- /layout -->
+
+  <div style="margin-top:20px;padding:14px 20px;background:#FEF8EC;border:1px solid #F0D98A;border-left:4px solid #E6A817;border-radius:12px;color:#1A2E2C;display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
+    <div style="font-weight:700;font-size:14px;color:#7A5200;white-space:nowrap;">⚠️ 위 시뮬레이터 외 결산 추가 고려 사항</div>
+    <ul style="margin:0;padding-left:18px;font-size:13px;line-height:1.9;color:#3A3A3A;display:flex;gap:24px;list-style:disc;flex-wrap:wrap;">
+      <li>
+        <span class="tooltip-trigger" data-tooltip="jajae" style="cursor:pointer;color:#7A5200;font-weight:600;text-decoration:underline;text-underline-offset:3px;">제작기자재</span>
+      </li>
+      <li>
+        <span class="tooltip-trigger" data-tooltip="jv" style="cursor:pointer;color:#7A5200;font-weight:600;text-decoration:underline;text-underline-offset:3px;">JV 현장 투입</span>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<!-- 툴팁 카드 (공통) -->
+<div id="tooltip-card" style="
+  display:none;
+  position:fixed;
+  z-index:9999;
+  width:560px;
+  background:#fff;
+  border:1px solid #F0D98A;
+  border-top:3px solid #E6A817;
+  border-radius:12px;
+  padding:12px 16px;
+  box-shadow:0 8px 28px rgba(0,0,0,0.15);
+  font-size:13px;
+  line-height:1.5;
+  color:#3A3A3A;
+  pointer-events:auto;
+">
+  <div id="tooltip-title" style="font-weight:700;font-size:13.5px;color:#7A5200;margin-bottom:8px;"></div>
+  <div id="tooltip-body"></div>
+</div>
+
+<script>
+  const tooltipContents = {
+    jajae: {
+      title: '제작기자재',
+      body: `
+        <div style="margin-bottom:8px;">
+          <div style="font-weight:700;font-size:11px;color:#7A5200;margin-bottom:3px;text-transform:uppercase;letter-spacing:0.04em;">적용 조건</div>
+          <div style="font-size:12.5px;color:#3A3A3A;line-height:1.6;">
+            제작 건당 <strong>$5백만불 이상</strong>, 제작기간 <strong>1년 이상</strong> 기자재
+            <span style="color:#888;font-size:11.5px;">&nbsp;(Bulk 자재 제외)</span>
+          </div>
+        </div>
+        <div style="border-top:1px solid #F0D98A;padding-top:8px;margin-bottom:8px;">
+          <div style="font-weight:700;font-size:11px;color:#7A5200;margin-bottom:3px;text-transform:uppercase;letter-spacing:0.04em;">결산 반영</div>
+          <div style="font-size:12.5px;color:#3A3A3A;line-height:1.6;">
+            제작기자재 총 금액 &times;
+            <span style="background:#FEF8EC;border:1px solid #F0D98A;border-radius:6px;padding:2px 8px;display:inline-block;margin-top:3px;font-size:12px;white-space:nowrap;">
+              Min( 단계별 상한 공정률, 제작공정률 &times; 단계별 가중치 )
+            </span>
+          </div>
+        </div>
+        <div style="border-top:1px solid #F0D98A;padding-top:8px;">
+          <div style="font-weight:700;font-size:11px;color:#7A5200;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.04em;">예시</div>
+          <div style="font-size:12px;color:#555;margin-bottom:6px;line-height:1.6;">
+            총 계약금액 <strong>$5백만불</strong> · 원자재 확보 완료 · 제작공정률 <strong>42%</strong>
+          </div>
+          <table style="width:100%;border-collapse:collapse;font-size:11.5px;text-align:center;margin-bottom:8px;">
+            <thead>
+              <tr style="background:#FEF8EC;">
+                <th style="padding:4px 6px;border:1px solid #F0D98A;color:#7A5200;font-weight:700;">단계</th>
+                <th style="padding:4px 6px;border:1px solid #F0D98A;color:#7A5200;font-weight:700;">상한 공정률</th>
+                <th style="padding:4px 6px;border:1px solid #F0D98A;color:#7A5200;font-weight:700;">가중치</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td style="padding:4px 6px;border:1px solid #F0D98A;border-bottom:1px solid #E6A817;text-align:left;">도면 승인</td><td style="padding:4px 6px;border:1px solid #F0D98A;border-bottom:1px solid #E6A817;">20%</td><td style="padding:4px 6px;border:1px solid #F0D98A;border-bottom:1px solid #E6A817;">0.9</td></tr>
+              <tr style="background:#FEF8EC;font-weight:700;">
+                <td style="padding:4px 6px;border:1px solid #E6A817;text-align:left;color:#7A5200;">✓ 원자재 확보</td>
+                <td style="padding:4px 6px;border:1px solid #E6A817;color:#7A5200;">40%</td>
+                <td style="padding:4px 6px;border:1px solid #E6A817;color:#7A5200;">0.9</td>
+              </tr>
+              <tr><td style="padding:4px 6px;border:1px solid #F0D98A;border-top:1px solid #E6A817;text-align:left;">중간 제작 검수</td><td style="padding:4px 6px;border:1px solid #F0D98A;border-top:1px solid #E6A817;">70%</td><td style="padding:4px 6px;border:1px solid #F0D98A;border-top:1px solid #E6A817;">0.9</td></tr>
+              <tr><td style="padding:4px 6px;border:1px solid #F0D98A;text-align:left;">최종 제작 검수</td><td style="padding:4px 6px;border:1px solid #F0D98A;">80%</td><td style="padding:4px 6px;border:1px solid #F0D98A;">0.9</td></tr>
+              <tr><td style="padding:4px 6px;border:1px solid #F0D98A;text-align:left;">제작국 선적</td><td style="padding:4px 6px;border:1px solid #F0D98A;">90%</td><td style="padding:4px 6px;border:1px solid #F0D98A;">1.0</td></tr>
+              <tr><td style="padding:4px 6px;border:1px solid #F0D98A;text-align:left;">현장 도착</td><td style="padding:4px 6px;border:1px solid #F0D98A;">95%</td><td style="padding:4px 6px;border:1px solid #F0D98A;">1.0</td></tr>
+              <tr><td style="padding:4px 6px;border:1px solid #F0D98A;text-align:left;">설치/시운전 완료</td><td style="padding:4px 6px;border:1px solid #F0D98A;">100%</td><td style="padding:4px 6px;border:1px solid #F0D98A;">1.0</td></tr>
+            </tbody>
+          </table>
+          <div style="background:#FEF8EC;border:1px solid #F0D98A;border-radius:8px;padding:8px 12px;font-size:12px;line-height:1.8;color:#3A3A3A;">
+            제작공정률 42% &times; 가중치 0.9 = <strong>37.8%</strong><br>
+            Min( 상한 40%, 37.8% ) = <strong>37.8%</strong><br>
+            인식 금액 = $5백만불 &times; 37.8% = <strong style="color:#007A6E;">$1,890,000</strong>
+          </div>
+        </div>
+      `
+    },
+    jv: {
+      title: 'JV 현장 투입',
+      body: `
+        <div style="margin-bottom:8px;">
+          <div style="font-weight:700;font-size:11px;color:#7A5200;margin-bottom:3px;text-transform:uppercase;letter-spacing:0.04em;">JV (Joint Venture)</div>
+          <div style="font-size:12.5px;color:#3A3A3A;line-height:1.6;">
+            두 개 이상의 건설사가 한시적으로 결성하는 <strong>공동 수급체</strong>
+          </div>
+        </div>
+        <div style="border-top:1px solid #F0D98A;padding-top:8px;margin-bottom:8px;">
+          <div style="font-weight:700;font-size:11px;color:#7A5200;margin-bottom:3px;text-transform:uppercase;letter-spacing:0.04em;">결산 반영</div>
+          <div style="font-size:12.5px;color:#3A3A3A;line-height:1.6;">
+            주간사 JV 계좌에 각 사 투입 취합 후 <strong>지분율 비례 각 사에 배분</strong>
+          </div>
+        </div>
+        <div style="border-top:1px solid #F0D98A;padding-top:8px;">
+          <div style="font-weight:700;font-size:11px;color:#7A5200;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.04em;">예시</div>
+          <div style="font-size:12px;color:#555;margin-bottom:6px;line-height:1.6;">
+            현대건설 <strong>60%</strong> · 삼성물산 <strong>40%</strong> 공사 수행 시,<br>
+            해당 월말 누계 투입: 현대건설 <strong>80억</strong> + 삼성물산 <strong>20억</strong> = 합계 <strong>100억</strong>
+          </div>
+          <table style="width:100%;border-collapse:collapse;font-size:12px;text-align:center;">
+            <thead>
+              <tr style="background:#FEF8EC;">
+                <th style="padding:5px 8px;border:1px solid #F0D98A;color:#7A5200;font-weight:700;">구분</th>
+                <th style="padding:5px 8px;border:1px solid #F0D98A;color:#7A5200;font-weight:700;">지분율</th>
+                <th style="padding:5px 8px;border:1px solid #F0D98A;color:#7A5200;font-weight:700;">합계 투입</th>
+                <th style="padding:5px 8px;border:1px solid #F0D98A;color:#7A5200;font-weight:700;">인식 금액</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding:5px 8px;border:1px solid #F0D98A;color:#3A3A3A;">현대건설</td>
+                <td style="padding:5px 8px;border:1px solid #F0D98A;">60%</td>
+                <td style="padding:5px 8px;border:1px solid #F0D98A;" rowspan="2">100억</td>
+                <td style="padding:5px 8px;border:1px solid #F0D98A;font-weight:700;color:#007A6E;">60억</td>
+              </tr>
+              <tr>
+                <td style="padding:5px 8px;border:1px solid #F0D98A;color:#3A3A3A;">삼성물산</td>
+                <td style="padding:5px 8px;border:1px solid #F0D98A;">40%</td>
+                <td style="padding:5px 8px;border:1px solid #F0D98A;font-weight:700;color:#007A6E;">40억</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `
+    }
+  };
+
+  const tooltipCard = document.getElementById('tooltip-card');
+  const tooltipTitle = document.getElementById('tooltip-title');
+  const tooltipBody  = document.getElementById('tooltip-body');
+  let activeTooltip  = null;
+
+  document.querySelectorAll('.tooltip-trigger').forEach(trigger => {
+    trigger.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const key = this.dataset.tooltip;
+
+      // 같은 항목 클릭 시 닫기
+      if (activeTooltip === key && tooltipCard.style.display === 'block') {
+        tooltipCard.style.display = 'none';
+        activeTooltip = null;
+        return;
+      }
+
+      activeTooltip = key;
+      const content = tooltipContents[key];
+      tooltipTitle.textContent = content.title;
+      tooltipBody.innerHTML = content.body;
+
+      // 위치 계산: 클릭한 요소 기준
+      const rect = this.getBoundingClientRect();
+      tooltipCard.style.display = 'block';
+
+      const cardW = 280;
+      const cardH = tooltipCard.offsetHeight;
+      const margin = 10;
+      const vpW = window.innerWidth;
+      const vpH = window.innerHeight;
+
+      let left = rect.right + margin;
+      let top  = rect.top;
+
+      // 오른쪽 공간 부족 시 왼쪽으로
+      if (left + cardW > vpW - margin) left = rect.left - cardW - margin;
+      // 아래쪽 공간 부족 시 위로 올리기
+      if (top + cardH > vpH - margin) top = vpH - cardH - margin;
+      if (top < margin) top = margin;
+
+      tooltipCard.style.left = left + 'px';
+      tooltipCard.style.top  = top  + 'px';
+    });
+  });
+
+  // 바깥 클릭 시 닫기
+  document.addEventListener('click', function() {
+    tooltipCard.style.display = 'none';
+    activeTooltip = null;
+  });
+  tooltipCard.addEventListener('click', e => e.stopPropagation());
+</script>
+
+<script>
+  const $ = id => document.getElementById(id);
+
+  function fmt(el) {
+    const raw = el.value.replace(/[^0-9]/g, "");
+    el.value = raw ? Number(raw).toLocaleString() : "";
+  }
+  function n(v)  { return Number(String(v).replace(/[^0-9.]/g, "")) || 0; }
+  function f(v)  { return Math.round(v).toLocaleString(); }
+  function fp(v, d) { return v.toFixed(d ?? 2); }
+
+  function setAmt(id, val) {
+    const el = $(id); if (!el) return;
+    el.textContent = f(val);
+    el.className = "";
+  }
+  function setAmtSign(id, val) {
+    const el = $(id); if (!el) return;
+    const sign = val > 0 ? "+" : "";
+    el.textContent = sign + f(val) ;
+    el.className = val > 0 ? "pos" : val < 0 ? "neg" : "";
+  }
+  function setProfit(id, val) {
+    const el = $(id); if (!el) return;
+    el.textContent = f(val);
+    el.className = val >= 0 ? "pos" : "neg";
+  }
+  function setRate(id, val) {
+    const el = $(id); if (!el) return;
+    el.textContent = fp(val) + "%";
+    el.className = val >= 0 ? "pos" : "neg";
+  }
+
+  function calc() {
+    /* 입력값 읽기 */
+    const contract  = n($("contract").value);
+    const totalR    = n($("totalR").value);           // 매출원가율(입력)
+    const defectR   = n($("defectR").value);          // 하자보수비율
+    const etcTotalR = n($("etcTotalR").value);        // 금융비용율(%)
+    const etcPreAmt  = n($("etcPreAmt").value);       // 착공 전 금융비용 금액
+    const etcPostAmt = n($("etcPostAmt").value);      // 착공 후 금융비용 금액 (당월말 누계)
+    const etcPreR    = contract > 0 ? (etcPreAmt  / contract * 100) : 0; // 착공 전 금융비용율
+    const etcPostR   = contract > 0 ? (etcPostAmt / contract * 100) : 0; // 착공 후 금융비용율
+    const actual     = n($("actualC").value);         // 당월말 누적 공사원가
+    const prevRev    = n($("prevRev").value);         // 전월말 누계 매출
+    const prevCost   = n($("prevCost").value);        // 전월말 누계 원가
+
+    /* 공사원가율 역산 (목표) — 금융비용은 etcTotalR 기준 */
+    const targetConstR = totalR - defectR - etcTotalR;
+
+    /* 실적 공사원가율 */
+    const actConstR = contract > 0 ? (actual / contract * 100) : 0;
+
+    /* 유효 공사원가율 = max(목표, 실적) */
+    const effConstR = Math.max(targetConstR, actConstR);
+
+    /* 유효 매출원가율 */
+    const effTotalR = effConstR + defectR + etcTotalR;
+
+    /* 자동산출 표시 */
+    $("constR_disp").value = fp(effConstR) + "%";
+
+    /* EAC — 금융비용은 etcTotalR 기준 단일 계산 */
+    const eac_const  = contract * (effConstR  / 100);
+    const eac_defect = contract * (defectR    / 100);
+    const eac_etc    = contract * (etcTotalR  / 100);  // 금융비용 총액
+    const eac        = eac_const + eac_defect + eac_etc;
+
+    /* POC = 누적공사원가 / 총예정공사원가 */
+    const poc = eac_const > 0 ? Math.min(1, actual / eac_const) : 0;
+
+    /* 누계 매출 */
+    const cum_rev = contract * poc;
+
+    /* 손실충당금 */
+    const isLoss     = effTotalR > 100;
+    const totalLoss  = isLoss ? eac - contract : 0;
+    const provision  = isLoss ? totalLoss * (1 - poc) : 0;   // 잔액 (미인식)
+    const recognized = isLoss ? totalLoss * poc : 0;          // 기인식분
+
+    /* 누계 원가 (손실충당금 잔액 포함) */
+    const cum_const   = actual;
+    const cum_defect  = eac_defect * poc;
+    const eac_etcPre  = contract * (etcPreR  / 100);
+    const eac_etcPost = etcPostAmt;
+    const cum_etcPre  = eac_etcPre * poc;
+    const cum_etcPost = etcPostAmt;
+    const cum_loss    = provision;                             // 손실충당금 잔액: 당월말 누계에 전액 반영
+    const cum_cost    = cum_const + cum_defect + cum_etcPre + cum_etcPost + cum_loss;
+
+    /* 누계 매출이익 */
+    const cum_profit = cum_rev - cum_cost;
+
+    /* 당월 = 누계 - 전월말 */
+    const cur_rev     = cum_rev  - prevRev;
+    const cur_cost    = cum_cost - prevCost;
+    const prevRatio   = (cum_cost - cum_etcPost - cum_loss) > 0
+                        ? prevCost / (cum_cost - cum_etcPost - cum_loss) : 0;
+    const cur_defect  = cum_defect * (1 - prevRatio);
+    const cur_etcPre  = cum_etcPre * (1 - prevRatio);
+    const cur_etcPost = cum_etcPost;
+    const cur_loss    = cum_loss;   // 손실충당금은 당월에 전액 인식
+    const cur_profit  = cur_rev - cur_cost;
+
+    /* 전월말 이익 */
+    const prev_profit = prevRev - prevCost;
+
+    /* POC / 당월말 매출 표시 */
+    $("poc").textContent = fp(poc * 100) + "%";
+    const cumRevSumEl = $("cum_rev_summary");
+    if (cumRevSumEl) cumRevSumEl.textContent = cum_rev > 0 ? f(cum_rev) : "—";
+
+    /* 설명 텍스트 업데이트 */
+    const fmt_c          = contract  > 0 ? "(" + f(contract)  + ")" : "";
+    const fmt_actual     = actual    > 0 ? "(" + f(actual)    + ")" : "";
+    const fmt_eac_const  = eac_const > 0 ? "(" + f(eac_const) + ", " + fp(effConstR) + "%)" : "";
+
+    const descActual = $("desc_actual");
+    if (descActual) descActual.textContent = fmt_actual;
+    const descEacConst = $("desc_eac_const");
+    if (descEacConst) descEacConst.textContent = fmt_eac_const;
+    const descContract = $("desc_contract");
+    if (descContract) descContract.textContent = fmt_c;
+
+    // EAC 세부 산식
+    const descConstF = $("desc_eac_const_formula");
+    if (descConstF) descConstF.textContent = contract > 0 ? "(" + f(contract) + " × " + fp(effConstR) + "%)" : "";
+    const descDefectF = $("desc_eac_defect_formula");
+    if (descDefectF) descDefectF.textContent = contract > 0 ? "(" + f(contract) + " × " + fp(defectR) + "%)" : "";
+    const descEtcF = $("desc_eac_etc_formula");
+    if (descEtcF) descEtcF.textContent = contract > 0 ? "(" + f(contract) + " × " + fp(etcTotalR) + "%)" : "";
+
+    /* 테이블 채우기 — 당월은 부호 없이 숫자만 */
+    setAmt("cum_rev",  cum_rev);
+    setAmt("prev_rev", prevRev);
+    setAmt("cur_rev",  cur_rev);
+
+    setAmt("cum_cost",  cum_cost);
+    setAmt("prev_cost", prevCost);
+    setAmt("cur_cost",  cur_cost);
+
+    setAmt("cum_const",  cum_const);
+    setAmt("cur_const",  cum_const - prevCost * (cum_const / (cum_cost || 1)));
+
+    setAmt("cum_defect", cum_defect);
+    setAmt("cur_defect", cur_defect);
+
+    setAmt("cum_etcPre",  cum_etcPre);
+    setAmt("cur_etcPre",  cur_etcPre);
+
+    setAmt("cum_etcPost", cum_etcPost);
+    setAmt("cur_etcPost", cur_etcPost);
+
+    /* 손실충당금 행 */
+    const lossRowEl = $("row_loss");
+    if (lossRowEl) lossRowEl.style.display = isLoss ? "" : "none";
+    if (isLoss) {
+      setAmt("cum_loss", cum_loss);
+      setAmt("cur_loss", cur_loss);
+    }
+
+    setProfit("cum_profit",  cum_profit);
+    setProfit("prev_profit", prev_profit);
+    setProfit("cur_profit",  cur_profit);
+
+    /* EAC */
+    $("eac").textContent        = f(eac);
+    $("eac_const").textContent  = f(eac_const);
+    $("eac_defect").textContent = f(eac_defect);
+    $("eac_etc").textContent    = f(eac_etc);
+    $("finalR").textContent     = fp(effTotalR) + "%";
+
+    const lossEl = $("lossSection");
+    const msgEl  = $("msg");
+    if (isLoss) {
+      lossEl.style.display = "block";
+      $("lossTotal").textContent = f(totalLoss)  ;
+      $("lossRec").textContent   = f(recognized);
+      $("lossAmt").textContent   = f(provision)  ;
+      msgEl.className = "alert warn";
+      msgEl.innerHTML = "⚠️ <b>실행원가율 100% 초과:</b> 손실 현장입니다. 공사손실충당금 계상이 필요합니다.";
+    } else {
+      lossEl.style.display = "none";
+      if (contract > 0) {
+        msgEl.className = "alert info";
+        msgEl.innerHTML = "✅ <b>정상 현장:</b> 도급 범위 내에서 원가가 관리되고 있습니다.";
+      } else {
+        msgEl.className = "alert";
+        msgEl.style.display = "none";
+      }
+    }
+  }
+
+  calc();
+
+  /* ── 하이라이트 로직 ── */
+  let activeEl = null;
+
+  function clearHighlight() {
+    document.querySelectorAll('.field-highlight').forEach(el => el.classList.remove('field-highlight'));
+    if (activeEl) { activeEl.style.background = ''; activeEl = null; }
+  }
+
+  document.querySelectorAll('[data-needs]').forEach(el => {
+    el.addEventListener('click', function(e) {
+      e.stopPropagation();
+      // 같은 항목 다시 클릭하면 해제
+      if (activeEl === this) { clearHighlight(); return; }
+      clearHighlight();
+      activeEl = this;
+      this.style.background = '#CCEFEC';
+      // 필요한 라벨들 하이라이트
+      const needs = this.dataset.needs.split(',');
+      needs.forEach(lbl => {
+        const field = document.querySelector('[data-lbl="' + lbl.trim() + '"]');
+        if (field) field.classList.add('field-highlight');
+      });
+    });
+  });
+
+  // 빈 곳 클릭 시 해제
+  document.addEventListener('click', clearHighlight);
+</script>
+
+</body>
+</html>
