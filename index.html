@@ -5,31 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>현장 실적 시뮬레이터</title>
   <style>
-    @font-face {
-      font-family: "HyundaiHarmonyL";
-      src: url("https://cdn.jsdelivr.net/gh/webfontworld/hyundai/HyundaiSansHeadKROTF-Light.woff2") format("woff2"),
-           url("https://cdn.jsdelivr.net/gh/webfontworld/hyundai/HyundaiSansHeadKROTF-Light.woff") format("woff");
-      font-weight: 300; font-style: normal;
-    }
-    @font-face {
-      font-family: "HyundaiHarmonyL";
-      src: url("https://cdn.jsdelivr.net/gh/webfontworld/hyundai/HyundaiSansHeadKROTF-Regular.woff2") format("woff2"),
-           url("https://cdn.jsdelivr.net/gh/webfontworld/hyundai/HyundaiSansHeadKROTF-Regular.woff") format("woff");
-      font-weight: 400; font-style: normal;
-    }
-    @font-face {
-      font-family: "HyundaiHarmonyL";
-      src: url("https://cdn.jsdelivr.net/gh/webfontworld/hyundai/HyundaiSansHeadKROTF-Medium.woff2") format("woff2"),
-           url("https://cdn.jsdelivr.net/gh/webfontworld/hyundai/HyundaiSansHeadKROTF-Medium.woff") format("woff");
-      font-weight: 500; font-style: normal;
-    }
-    @font-face {
-      font-family: "HyundaiHarmonyL";
-      src: url("https://cdn.jsdelivr.net/gh/webfontworld/hyundai/HyundaiSansHeadKROTF-Bold.woff2") format("woff2"),
-           url("https://cdn.jsdelivr.net/gh/webfontworld/hyundai/HyundaiSansHeadKROTF-Bold.woff") format("woff");
-      font-weight: 700; font-style: normal;
-    }
-
     :root {
       --primary:      #007A6E;
       --primary-dark: #005C52;
@@ -54,57 +29,76 @@
     }
 
     *, *::before, *::after { box-sizing: border-box; }
+
+    /* ── 폰트 정의 : 한글 전용 현대하모니 L ── */
+    @font-face {
+      font-family: "HyundaiHarmonyL";
+      src: url("https://cdn.jsdelivr.net/gh/webfontworld/hyundai/HyundaiSansHeadKROTF-Light.woff2") format("woff2"),
+           url("https://cdn.jsdelivr.net/gh/webfontworld/hyundai/HyundaiSansHeadKROTF-Light.woff") format("woff");
+      font-weight: 300; font-style: normal;
+      unicode-range: U+AC00-D7A3, U+1100-11FF, U+3130-318F, U+A960-A97F, U+D7B0-D7FF;
+    }
+    @font-face {
+      font-family: "HyundaiHarmonyL";
+      src: url("https://cdn.jsdelivr.net/gh/webfontworld/hyundai/HyundaiSansHeadKROTF-Regular.woff2") format("woff2"),
+           url("https://cdn.jsdelivr.net/gh/webfontworld/hyundai/HyundaiSansHeadKROTF-Regular.woff") format("woff");
+      font-weight: 400; font-style: normal;
+      unicode-range: U+AC00-D7A3, U+1100-11FF, U+3130-318F, U+A960-A97F, U+D7B0-D7FF;
+    }
+    @font-face {
+      font-family: "HyundaiHarmonyL";
+      src: url("https://cdn.jsdelivr.net/gh/webfontworld/hyundai/HyundaiSansHeadKROTF-Medium.woff2") format("woff2"),
+           url("https://cdn.jsdelivr.net/gh/webfontworld/hyundai/HyundaiSansHeadKROTF-Medium.woff") format("woff");
+      font-weight: 500; font-style: normal;
+      unicode-range: U+AC00-D7A3, U+1100-11FF, U+3130-318F, U+A960-A97F, U+D7B0-D7FF;
+    }
+    @font-face {
+      font-family: "HyundaiHarmonyL";
+      src: url("https://cdn.jsdelivr.net/gh/webfontworld/hyundai/HyundaiSansHeadKROTF-Bold.woff2") format("woff2"),
+           url("https://cdn.jsdelivr.net/gh/webfontworld/hyundai/HyundaiSansHeadKROTF-Bold.woff") format("woff");
+      font-weight: 700; font-style: normal;
+      unicode-range: U+AC00-D7A3, U+1100-11FF, U+3130-318F, U+A960-A97F, U+D7B0-D7FF;
+    }
+
+    /* 영문/숫자 → Arial, 한글 → HyundaiHarmonyL (unicode-range로 자동 적용) */
     body {
       margin: 0; background: var(--bg); color: var(--text);
-      font-family: Arial, "KoreanOnly", sans-serif;
+      font-family: Arial, "HyundaiHarmonyL", sans-serif;
       line-height: 1.55; padding: 20px 16px 40px;
     }
-    /* 한글 영역만 HyundaiHarmonyL 적용, 영문·숫자·기호는 Arial 우선 */
-    :lang(ko), body { unicode-bidi: normal; }
-    *:not(input):not(select) {
-      font-family: Arial, "KoreanOnly", sans-serif;
+    * { font-family: Arial, "HyundaiHarmonyL", sans-serif; }
+    .container { max-width: 1400px; margin: 0 auto; }
+
+    /* PULSE GLOW 애니메이션 */
+    @keyframes pulseGlow {
+      0%   { text-shadow: 0 0 8px rgba(0,255,220,0.4), 0 0 20px rgba(0,200,170,0.2); }
+      50%  { text-shadow: 0 0 18px rgba(0,255,220,0.85), 0 0 40px rgba(0,200,170,0.55), 0 0 60px rgba(0,168,150,0.3); }
+      100% { text-shadow: 0 0 8px rgba(0,255,220,0.4), 0 0 20px rgba(0,200,170,0.2); }
     }
-    /* 한글 문자에만 HyundaiHarmonyL 덮어쓰기 */
-    @font-face {
-      font-family: "KoreanOnly";
-      src: url("https://cdn.jsdelivr.net/gh/webfontworld/hyundai/HyundaiSansHeadKROTF-Regular.woff2") format("woff2");
-      font-weight: 400;
-      unicode-range: U+AC00-D7A3, U+1100-11FF, U+3130-318F, U+A960-A97F, U+D7B0-D7FF;
-    }
-    @font-face {
-      font-family: "KoreanOnly";
-      src: url("https://cdn.jsdelivr.net/gh/webfontworld/hyundai/HyundaiSansHeadKROTF-Bold.woff2") format("woff2");
-      font-weight: 700;
-      unicode-range: U+AC00-D7A3, U+1100-11FF, U+3130-318F, U+A960-A97F, U+D7B0-D7FF;
-    }
-    @font-face {
-      font-family: "KoreanOnly";
-      src: url("https://cdn.jsdelivr.net/gh/webfontworld/hyundai/HyundaiSansHeadKROTF-Medium.woff2") format("woff2");
-      font-weight: 500;
-      unicode-range: U+AC00-D7A3, U+1100-11FF, U+3130-318F, U+A960-A97F, U+D7B0-D7FF;
-    }
-    body, button, label, span, td, th, div, p, h1, h2, h3, select, textarea {
-      font-family: "KoreanOnly", Arial, sans-serif;
-    }
-    input {
-      font-family: Arial, "KoreanOnly", sans-serif;
-    }
-    .container { max-width: 1100px; margin: 0 auto; }
+
 
     /* HEADER */
     header {
-      background: linear-gradient(135deg, var(--primary-dark) 0%, var(--teal) 100%);
+      background: linear-gradient(135deg, #005C52 0%, #007A6E 100%);
       border-radius: var(--radius-card); padding: 22px 28px; margin-bottom: 20px;
-      display: flex; align-items: center; justify-content: space-between;
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
       box-shadow: 0 6px 24px rgba(0,90,82,0.22);
     }
-    .header-left h1 { font-size: 19px; font-weight: 700; color: #fff; margin: 0; }
-    .header-left .desc { font-size: 12.5px; color: rgba(255,255,255,0.78); margin-top: 4px; }
+    .header-center { text-align: center; }
+    .header-center h1 {
+      font-size: 22px; font-weight: 700; color: #fff; margin: 0;
+      animation: pulseGlow 2.4s ease-in-out infinite;
+      letter-spacing: 0.5px;
+      display: inline-block;
+    }
+    .header-center .desc { font-size: 12.5px; color: rgba(255,255,255,0.78); margin-top: 5px; }
     .badge {
       font-family: Arial, sans-serif; font-size: 11px; font-weight: 700;
       padding: 5px 13px; background: rgba(255,255,255,0.18);
       border: 1.5px solid rgba(255,255,255,0.35);
       border-radius: var(--radius-pill); color: #fff;
+      position: absolute; right: 28px; top: 50%; transform: translateY(-50%);
     }
 
     /* LAYOUT */
@@ -122,14 +116,14 @@
       box-shadow: var(--shadow-card); transition: box-shadow .2s;
     }
     .card:hover { box-shadow: var(--shadow-hover); }
-    .card-input  { border-top: 4px solid var(--teal); }
+    .card-input  { border-top: 4px solid var(--primary); }
     .card-result { border-top: 4px solid var(--primary); }
 
     /* CARD TITLE */
     .card-title {
       font-size: 15px; font-weight: 700; margin-bottom: 16px;
       color: #fff; padding: 9px 16px;
-      background: linear-gradient(135deg, var(--primary-dark), var(--teal));
+      background: linear-gradient(135deg, #005C52, #007A6E);
       border-radius: 10px; display: block;
       letter-spacing: -0.2px;
     }
@@ -157,7 +151,7 @@
       transition: border-color .15s, box-shadow .15s;
     }
     select { text-align: left; padding-left: 12px; font-family: "KoreanOnly", Arial, sans-serif; font-size: 13px; cursor: pointer; }
-    input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px var(--teal-light); }
+    input:focus { border-color: var(--primary-dark); box-shadow: 0 0 0 3px var(--teal-light); }
     input::placeholder { color: #b0c4c2; }
     .unit { position: absolute; left: 11px; font-size: 11px; color: var(--muted); pointer-events: none; }
     .input-row .unit + input { padding-left: 30px; }
@@ -271,26 +265,580 @@
     /* 주석 */
     .note { margin-top: 16px; font-size: 11px; color: #8AACAA; line-height: 1.85; }
 
-    /* footer */
+    @keyframes pulseGrow {
+      0%   { transform: scale(1);    box-shadow: 0 2px 8px rgba(0,122,110,0.10); }
+      50%  { transform: scale(1.02); box-shadow: 0 6px 20px rgba(0,122,110,0.22); }
+      100% { transform: scale(1);    box-shadow: 0 2px 8px rgba(0,122,110,0.10); }
+    }
+    .formula-box { cursor: default; }
+    .formula-box:hover { animation: pulseGrow 1.2s ease-in-out infinite; }
     .footer { margin-top: 18px; font-size: 11px; color: var(--muted); text-align: center; border-top: 1px solid var(--border-light); padding-top: 12px; }
+
+    /* ── SECTION BLOCKS ── */
+    .section-block {
+      background: #fff;
+      border-radius: 18px;
+      border: 1.5px solid var(--border-light);
+      box-shadow: var(--shadow-card);
+      padding: 28px 30px 24px;
+      margin-bottom: 32px;
+    }
+    .section-intro {
+      font-size: 17px; font-weight: 700; color: var(--primary-dark);
+      margin-bottom: 20px;
+      padding-left: 12px;
+      border-left: 4px solid var(--teal);
+      line-height: 1.4;
+    }
+
+    /* ── FLOW DIAGRAM ── */
+    .flow-wrap {
+      display: flex; align-items: center; gap: 0;
+      overflow-x: auto; padding: 8px 0 16px;
+      margin-bottom: 14px;
+      /* 흐름 강조 연결선 배경 */
+      position: relative;
+    }
+
+    /* 스텝 박스 */
+    .flow-box {
+      flex: 1; min-width: 120px;
+      border-radius: 14px; padding: 12px 10px;
+      border: 2px solid var(--border);
+      display: flex; flex-direction: column; justify-content: center;
+      cursor: default;
+      position: relative;
+      transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease, background .25s ease;
+      z-index: 1;
+    }
+    /* 입장 애니메이션 */
+    .flow-box { animation: flowFadeIn .5s ease both; }
+    .flow-box:nth-child(1) { animation-delay: .05s; }
+    .flow-box:nth-child(3) { animation-delay: .2s; }
+    .flow-box:nth-child(5) { animation-delay: .35s; }
+    .flow-box:nth-child(7) { animation-delay: .5s; }
+    .flow-box:nth-child(9) { animation-delay: .65s; }
+    @keyframes flowFadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 호버 강조 */
+    .flow-box:hover {
+      transform: translateY(-5px) scale(1.03);
+      box-shadow: 0 10px 28px rgba(0,122,110,0.18);
+      border-color: var(--teal);
+      z-index: 3;
+    }
+    /* 다른 박스가 호버될 때 나머지 흐리게 */
+    .flow-wrap:has(.flow-box:hover) .flow-box:not(:hover) {
+      opacity: 0.45;
+      transform: scale(0.97);
+    }
+    .flow-wrap:has(.flow-box:hover) .flow-connector:not(.flow-connector--active) {
+      opacity: 0.35;
+    }
+
+    .flow-box--green {
+      background: #E6F4F2;
+      border-color: var(--border);
+    }
+    .flow-box--teal {
+      background: #E6F4F2;
+      border-color: var(--border);
+    }
+    .flow-box--accent {
+      background: #E6F4F2;
+      border-color: var(--border);
+    }
+    .flow-box__step {
+      font-size: 9.5px; font-weight: 700; color: #fff;
+      background: var(--teal); border-radius: 20px;
+      padding: 1px 8px; display: inline-block;
+      margin: 0 auto 7px; letter-spacing: .04em;
+    }
+    .flow-box--accent .flow-box__step { background: var(--primary-dark); }
+    .flow-box__title {
+      font-size: 12px; font-weight: 700; color: var(--primary-dark);
+      margin-bottom: 5px; text-align: center;
+    }
+    .flow-box__desc {
+      font-size: 11px; color: var(--muted); line-height: 1.55; text-align: center;
+    }
+    .flow-box__sub {
+      font-size: 10px; color: #5a9090; margin-top: 4px; line-height: 1.5; text-align: center;
+    }
+    .flow-rate {
+      display: inline-block;
+      background: rgba(0,122,110,0.12);
+      color: var(--primary-dark);
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 5px;
+      box-shadow: 0 1px 4px rgba(0,90,82,0.18), inset 0 1px 2px rgba(255,255,255,0.6);
+      font-size: inherit;
+    }
+
+    /* 연결 커넥터 */
+    .flow-connector {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      min-width: 52px; flex-shrink: 0;
+      gap: 4px; position: relative; z-index: 2;
+      transition: opacity .25s;
+    }
+    .flow-connector__track {
+      width: 100%; height: 3px;
+      background: linear-gradient(90deg, var(--teal), var(--primary-dark));
+      border-radius: 2px; position: relative;
+    }
+    /* 흐르는 점 애니메이션 */
+    .flow-connector__track::after {
+      content: '';
+      position: absolute; top: -3px; left: -6px;
+      width: 9px; height: 9px;
+      background: var(--teal); border-radius: 50%;
+      box-shadow: 0 0 6px rgba(0,168,150,0.7);
+      animation: flowDot 2s linear infinite;
+    }
+    .flow-connector:nth-of-type(2) .flow-connector__track::after { animation-delay: .66s; }
+    .flow-connector:nth-of-type(4) .flow-connector__track::after { animation-delay: 1.33s; }
+    @keyframes flowDot {
+      0%   { left: -6px; opacity: 0; }
+      10%  { opacity: 1; }
+      90%  { opacity: 1; }
+      100% { left: calc(100% - 3px); opacity: 0; }
+    }
+    .flow-connector__arrow {
+      width: 0; height: 0;
+      border-top: 7px solid transparent;
+      border-bottom: 7px solid transparent;
+      border-left: 10px solid var(--primary-dark);
+      margin-top: -1px; flex-shrink: 0;
+      align-self: center;
+    }
+    .flow-connector__label {
+      font-size: 9.5px; font-weight: 700; color: var(--primary-dark);
+      text-align: center; line-height: 1.4; white-space: nowrap;
+      padding: 2px 4px; border-radius: 6px;
+      text-shadow: 0 1px 4px rgba(0,90,82,0.25), 0 0 8px rgba(0,168,150,0.15);
+    }
+    .flow-connector__label span { font-weight: 400; color: var(--muted); display: block;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    }
+
+    .krw-note {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--primary-light); border: 1px solid var(--teal-light);
+      border-radius: 10px; padding: 10px 16px;
+      font-size: 13px; color: var(--text); line-height: 1.6;
+    }
+    .krw-note__icon { font-size: 18px; flex-shrink: 0; }
+
+    /* ── FACTOR CARDS (flip) ── */
+    .factor-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+    }
+    @media (max-width: 900px) { .factor-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 600px) { .factor-grid { grid-template-columns: repeat(2, 1fr); } }
+
+    .factor-card {
+      position: relative; height: 340px;
+      cursor: default;
+      perspective: 900px;
+    }
+    .factor-front,
+    .factor-back {
+      position: absolute; inset: 0;
+      border-radius: 14px;
+      padding: 18px 16px;
+      display: flex; flex-direction: column; justify-content: center;
+      backface-visibility: hidden;
+      will-change: clip-path, opacity;
+      transition: none;
+    }
+    .factor-front {
+      color: #fff;
+      text-align: center;
+      clip-path: inset(0 0 0 0);
+      opacity: 1;
+      z-index: 2;
+    }
+    /* 카드별 개별 색상 */
+    .factor-card--1 .factor-front { background: linear-gradient(135deg, #1A6B5A, #00A896); }
+    .factor-card--2 .factor-front { background: linear-gradient(135deg, #2E5FA3, #5B9BD5); }
+    .factor-card--3 .factor-front { background: linear-gradient(135deg, #6B3A8C, #A067C4); }
+    .factor-card--4 .factor-front { background: linear-gradient(135deg, #8C4A1A, #D4874E); }
+    /* 뒷면 상단 보더도 카드별 색상 */
+    .factor-card--1 .factor-back { border-color: #00A896; }
+    .factor-card--2 .factor-back { border-color: #5B9BD5; }
+    .factor-card--3 .factor-back { border-color: #A067C4; }
+    .factor-card--4 .factor-back { border-color: #D4874E; }
+    .factor-back {
+      background: #fff;
+      border: 2px solid var(--teal-light);
+      color: var(--text);
+      clip-path: inset(0 100% 0 0);
+      opacity: 0;
+      z-index: 1;
+      justify-content: flex-start;
+      overflow-y: auto;
+    }
+    /* Shutter Out Horizontal — front 닫힘, back 열림 */
+    .factor-card.flipped .factor-front {
+      animation: shutterClose .35s ease-in forwards;
+    }
+    .factor-card.flipped .factor-back {
+      animation: shutterOpen .35s ease-out .18s forwards;
+    }
+    .factor-card.unflipping .factor-front {
+      animation: shutterOpen .3s ease-out .15s forwards;
+    }
+    .factor-card.unflipping .factor-back {
+      animation: shutterClose .3s ease-in forwards;
+    }
+    @keyframes shutterClose {
+      0%   { clip-path: inset(0 0%  0 0%);  opacity: 1; }
+      100% { clip-path: inset(0 50% 0 50%); opacity: 0; }
+    }
+    @keyframes shutterOpen {
+      0%   { clip-path: inset(0 50% 0 50%); opacity: 0; }
+      100% { clip-path: inset(0 0%  0 0%);  opacity: 1; }
+    }
+
+    .factor-num {
+      font-size: 32px; font-weight: 700; opacity: .9;
+      line-height: 1; margin-bottom: 6px; font-family: Arial, sans-serif;
+    }
+    .factor-name {
+      font-size: 15px; font-weight: 700; line-height: 1.3;
+    }
+    .factor-hint {
+      font-size: 10.5px; opacity: .65; margin-top: 8px;
+    }
+    .factor-back__title {
+      font-size: 13px; font-weight: 700; color: var(--primary-dark);
+      margin-bottom: 8px;
+    }
+    .factor-back__body {
+      font-size: 12.5px; line-height: 1.65; color: var(--text);
+    }
   </style>
 </head>
 <body>
 <div class="container">
 
   <header>
-    <div class="header-left">
-      <h1>🏗️ 현장 실적 시뮬레이터</h1>
-      <div class="desc">진행률 기반 매출 · 매출이익 산출</div>
+    <div class="header-center">
+      <h1>🏗️ 건설회계 결산 로직의 이해</h1>
+      <div class="desc">진행률 기반 매출/매출이익 산출</div>
     </div>
     <div class="badge">v6.0</div>
   </header>
 
-  <div style="font-size:11.5px;color:var(--muted);padding:8px 14px;margin-bottom:12px;background:var(--bg);border-radius:10px;">
-    ※ 본 시뮬레이터는 IFRS 제1115호에 따라 진행률 기준 매출 인식을 적용합니다.
+  <!-- 공지 도입부 -->
+  <div style="background:#fff;border:1.5px solid var(--border-light);border-left:5px solid var(--teal);border-radius:14px;padding:20px 26px;margin-bottom:24px;">
+    <div style="font-size:15px;color:#1A2E2C;line-height:2;">
+      우리 회사의 결산 로직과 현장에서 실적 추정 시 놓치기 쉬운 주요 고려사항을 정리하여 공유드립니다.<br>
+      본 가이드를 통해 각 현장에서 보다 정교한 <strong style="background:#FFF176;padding:1px 4px;border-radius:3px;color:#1A2E2C;">실적 관리</strong>가 이루어질 수 있도록 적극 활용해 주시기 바랍니다.
+    </div>
   </div>
 
-  <div class="layout">
+  <!-- ══════════════════════════════════════════
+       SECTION 1 : 결산 방식
+  ══════════════════════════════════════════ -->
+  <div class="section-block">
+    <div class="section-intro">우리 회사의 각 현장 실적은 <strong style="background:#FFF176;padding:1px 4px;border-radius:3px;color:#1A2E2C;">진행률 기반</strong>으로 산출되며, 이는 공사의 진척 정도에 따라 수익(매출)과 비용(원가)를 인식하는 방식입니다.</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+
+      <!-- 왼쪽: 산출 공식 박스들 -->
+      <div style="display:flex;flex-direction:column;gap:10px;">
+
+        <!-- ① 진행률이란? -->
+        <div class="formula-box" style="background:#E6F4F2;border:1.5px solid #C8DDD9;border-left:4px solid #007A6E;border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;box-shadow:0 4px 14px rgba(30,80,160,0.18),0 1px 4px rgba(30,80,160,0.10);flex:1;">
+          <span style="font-size:13px;font-weight:700;color:#005C52;background:#fff;padding:3px 12px;border-radius:20px;white-space:nowrap;align-self:flex-start;">① 진행률이란?</span>
+          <span style="font-size:12.5px;color:#1A2E2C;line-height:1.7;">진행률이란 전체 공사 과정에서 현재 어느 정도 공사가 수행되었는지를 나타내는 지표입니다.</span>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <span style="font-size:12.5px;font-weight:700;color:#5A7472;white-space:nowrap;">당월 누적 진행률</span>
+            <span style="color:#5A7472;font-weight:700;font-size:14px;flex-shrink:0;">=</span>
+            <div style="display:inline-flex;flex-direction:column;align-items:center;flex-shrink:0;">
+              <span style="font-weight:700;font-size:13px;color:#1A2E2C;border-bottom:2px solid #007A6E;padding-bottom:2px;">당월말 누적 공사 원가</span>
+              <span style="font-weight:700;font-size:13px;color:#1A2E2C;padding-top:2px;">총 예정원가</span>
+            </div>
+            <span style="font-size:11.5px;font-weight:700;color:#5A7472;white-space:nowrap;">(하자보수비, 금융비용 제외)</span>
+          </div>
+        </div>
+
+        <!-- ② 매출액 -->
+        <div class="formula-box" style="background:#E6F4F2;border:1.5px solid #C8DDD9;border-left:4px solid #007A6E;border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;box-shadow:0 4px 14px rgba(30,80,160,0.18),0 1px 4px rgba(30,80,160,0.10);flex:1;">
+          <span style="font-size:13px;font-weight:700;color:#005C52;background:#fff;padding:3px 12px;border-radius:20px;white-space:nowrap;align-self:flex-start;">② 매출액</span>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <span style="font-size:12.5px;font-weight:700;color:#5A7472;white-space:nowrap;">당월 누적 매출액</span>
+            <span style="color:#5A7472;font-weight:700;font-size:14px;">:</span>
+            <span style="font-weight:700;font-size:13px;white-space:nowrap;">당월말 기준 총도급금액 × 당월 누적 진행률</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <span style="font-size:12.5px;font-weight:700;color:#5A7472;white-space:nowrap;">당월 매출</span>
+            <span style="color:#5A7472;font-weight:700;font-size:14px;">=</span>
+            <span style="font-weight:700;font-size:13px;white-space:nowrap;">당월 누적 매출 − 전월 누적 매출</span>
+          </div>
+          <div style="font-size:11.5px;color:#005C52;font-weight:600;line-height:1.6;background:#FFFBE6;border-radius:7px;padding:7px 10px;border:1px solid #FFE58F;">
+            📌 현장의 당월 실적은 당월 누적에서 전월 누적을 차감하는 방식으로 산출해야 함을 기억해주세요.
+          </div>
+        </div>
+
+        <!-- ③ 공사원가 -->
+        <div class="formula-box" style="background:#E6F4F2;border:1.5px solid #C8DDD9;border-left:4px solid #007A6E;border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;box-shadow:0 4px 14px rgba(30,80,160,0.18),0 1px 4px rgba(30,80,160,0.10);flex:1;">
+          <span style="font-size:13px;font-weight:700;color:#005C52;background:#fff;padding:3px 12px;border-radius:20px;white-space:nowrap;align-self:flex-start;">③ 공사원가</span>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <span style="font-size:12.5px;font-weight:700;color:#5A7472;white-space:nowrap;">당월 공사원가</span>
+            <span style="color:#5A7472;font-weight:700;font-size:14px;">=</span>
+            <span style="font-weight:700;font-size:13px;white-space:nowrap;">당월말 누적공사원가 − 전월말 누적 공사원가</span>
+          </div>
+        </div>
+
+        <!-- ④ 매출이익 -->
+        <div class="formula-box" style="background:#E6F4F2;border:1.5px solid #C8DDD9;border-left:4px solid #007A6E;border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;box-shadow:0 4px 14px rgba(30,80,160,0.18),0 1px 4px rgba(30,80,160,0.10);flex:1;">
+          <span style="font-size:13px;font-weight:700;color:#005C52;background:#fff;padding:3px 12px;border-radius:20px;white-space:nowrap;align-self:flex-start;">④ 매출이익</span>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <span style="font-size:12.5px;font-weight:700;color:#5A7472;white-space:nowrap;">당월 매출이익</span>
+            <span style="color:#5A7472;font-weight:700;font-size:14px;">=</span>
+            <span style="font-weight:700;font-size:13px;white-space:nowrap;">당월 매출 − 당월 공사원가 − 하자보수비 − 금융비용</span>
+          </div>
+          <div style="font-size:11.5px;color:#005C52;font-weight:600;line-height:1.6;background:#FFFBE6;border-radius:7px;padding:7px 10px;border:1px solid #FFE58F;">
+            📌 진행률 산식에는 제외했던 하자보수비와 금융비용을 이익 계산 시 별도로 차감하여 실제 현장의 매출이익이 확정됩니다.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 오른쪽: 핵심 개념 강조 -->
+      <div class="formula-box" style="background:linear-gradient(135deg,#005C52,#007A6E);border-radius:12px;padding:32px 28px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-shadow:0 4px 14px rgba(30,80,160,0.18),0 1px 4px rgba(30,80,160,0.10);">
+        <span style="font-size:28px;margin-bottom:12px;">⭐</span>
+        <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:14px;letter-spacing:0.05em;">매출 계산 시</div>
+
+        <!-- X / O 비교 -->
+        <div style="width:100%;display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
+          <!-- 투입 ÷ 원가율 → X -->
+          <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(200,50,50,0.2);border:1.5px solid rgba(255,100,100,0.35);border-radius:10px;padding:12px 16px;min-height:62px;">
+            <span style="font-size:18px;font-weight:700;color:rgba(255,180,180,0.85);">투입 ÷ 원가율</span>
+            <span style="font-size:22px;font-weight:900;color:#ff6b6b;font-family:Arial,sans-serif;">X</span>
+          </div>
+          <!-- 계약고 × 진행률 → O -->
+          <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(30,200,120,0.22);border:1.5px solid rgba(100,220,150,0.45);border-radius:10px;padding:12px 16px;min-height:62px;">
+            <span style="font-size:18px;font-weight:700;color:#fff;">계약고 × 진행률</span>
+            <span style="font-size:22px;font-weight:900;color:#6be8a0;font-family:Arial,sans-serif;">O</span>
+          </div>
+        </div>
+
+        <div style="font-size:14px;font-weight:700;color:#fff;line-height:1.8;border-top:1px solid rgba(255,255,255,0.2);padding-top:14px;width:100%;text-align:center;">
+          원가 투입이 많다고 매출이 늘어나는 것이 아니라,<br>공사 진행률이 높아질수록 매출이 인식됩니다.
+        </div>
+        <div style="font-size:12px;color:rgba(255,255,200,0.85);line-height:1.7;background:rgba(0,0,0,0.18);border-radius:8px;padding:10px 14px;margin-top:10px;width:100%;text-align:left;">
+          <span style="display:inline-flex;gap:5px;align-items:flex-start;"><span style="flex-shrink:0;">⚠️</span><span>단순 투입 ÷ 원가율로 계산 시, 현장 원가율이 변동되거나 금융비용이 있는 현장은<br>매출 왜곡이 발생할 수 있습니다.</span></span>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SECTION 2 : 결산 체크포인트
+  ══════════════════════════════════════════ -->
+  <div class="section-block">
+    <div class="section-intro"><span style="color:#E88080;">✔</span> 실적 추정, 결산 시 놓치기 쉬운 체크 포인트</div>
+    <div style="font-size:14px;font-weight:700;color:var(--muted);margin-bottom:18px;margin-top:-10px;">정확한 결산을 위해 아래 항목들을 검토해주세요.</div>
+
+    <div class="factor-grid" style="grid-template-columns:repeat(5,1fr);">
+
+      <!-- 1. 마감 해제 후 투입 -->
+      <div class="factor-card factor-card--4" onmouseenter="flipCard(this)" onmouseleave="unflipCard(this)">
+        <div class="factor-front">
+          
+          <div class="factor-name">마감 해제 후 투입</div>
+          <div class="factor-hint">커서를 올려 상세 보기 →</div>
+        </div>
+        <div class="factor-back" style="justify-content:center;">
+          <div class="factor-back__title">마감 해제 후 투입</div>
+          <div class="factor-back__body" style="font-size:11.5px;">
+            <div style="line-height:1.7;margin-bottom:10px;">
+              당월 회계 마감 후 <strong>마감을 해제</strong>하고 추가 투입한 비용은 해당 월 실적이 이미 확정된 상태이므로, 당월이 아닌 <strong style="color:#D93B3B;">익월 실적에 포함</strong>됩니다.
+            </div>
+            <div style="background:#E6F4F2;border-radius:7px;padding:7px 10px;font-size:11px;line-height:1.6;">
+              <strong>예)</strong> 3월 마감 해제 후 투입된 비용 → <strong>4월 실적</strong>에 포함
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. 제작기자재 진행률 인식 -->
+      <div class="factor-card factor-card--2" onmouseenter="flipCard(this)" onmouseleave="unflipCard(this)">
+        <div class="factor-front">
+          
+          <div class="factor-name">제작기자재<br>진행률 인식</div>
+          <div class="factor-hint">커서를 올려 상세 보기 →</div>
+        </div>
+        <div class="factor-back">
+          <div class="factor-back__title">제작기자재 진행률 인식</div>
+          <div class="factor-back__body" style="font-size:11px;">
+            <div style="margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid #E4EFED;line-height:1.65;">
+              단순히 인보이스나 세금계산서 발행 금액 기준으로 투입 인식 <strong style="color:#D93B3B;">✕</strong><br>
+              실제 <strong>제작 공정률에 따라</strong> 투입비를 인식합니다.
+            </div>
+            <div style="background:#E6F4F2;border-radius:5px;padding:3px 7px;font-size:10.5px;font-weight:700;color:#005C52;margin-bottom:6px;text-align:center;">Min( 단계별 상한 공정률, 제작공정률 × 단계별 가중치 )</div>
+            <div style="font-size:10.5px;color:#5A7472;margin-bottom:4px;font-weight:700;">📌 계산 예시 — $5M · 원자재 확보 완료 · 공정률 42%</div>
+            <table style="width:100%;border-collapse:collapse;font-size:10px;text-align:center;margin-bottom:5px;">
+              <thead><tr style="background:#FEF8EC;">
+                <th style="padding:2px 4px;border:1px solid #F0D98A;color:#7A5200;text-align:left;">단계</th>
+                <th style="padding:2px 4px;border:1px solid #F0D98A;color:#7A5200;">상한</th>
+                <th style="padding:2px 4px;border:1px solid #F0D98A;color:#7A5200;">가중치</th>
+              </tr></thead>
+              <tbody>
+                <tr><td style="padding:2px 4px;border:1px solid #F0D98A;text-align:left;color:#5A7472;">도면 승인</td><td style="padding:2px 4px;border:1px solid #F0D98A;">20%</td><td style="padding:2px 4px;border:1px solid #F0D98A;">0.9</td></tr>
+                <tr style="background:#FEF8EC;font-weight:700;"><td style="padding:2px 4px;border:1px solid #E6A817;text-align:left;color:#7A5200;">✓ 원자재 확보</td><td style="padding:2px 4px;border:1px solid #E6A817;color:#7A5200;">40%</td><td style="padding:2px 4px;border:1px solid #E6A817;color:#7A5200;">0.9</td></tr>
+                <tr><td style="padding:2px 4px;border:1px solid #F0D98A;text-align:left;color:#5A7472;">중간 제작 검수</td><td style="padding:2px 4px;border:1px solid #F0D98A;">70%</td><td style="padding:2px 4px;border:1px solid #F0D98A;">0.9</td></tr>
+                <tr><td style="padding:2px 4px;border:1px solid #F0D98A;text-align:left;color:#5A7472;">최종 제작 검수</td><td style="padding:2px 4px;border:1px solid #F0D98A;">80%</td><td style="padding:2px 4px;border:1px solid #F0D98A;">0.9</td></tr>
+                <tr><td style="padding:2px 4px;border:1px solid #F0D98A;text-align:left;color:#5A7472;">제작국 선적</td><td style="padding:2px 4px;border:1px solid #F0D98A;">90%</td><td style="padding:2px 4px;border:1px solid #F0D98A;">1.0</td></tr>
+                <tr><td style="padding:2px 4px;border:1px solid #F0D98A;text-align:left;color:#5A7472;">현장 도착</td><td style="padding:2px 4px;border:1px solid #F0D98A;">95%</td><td style="padding:2px 4px;border:1px solid #F0D98A;">1.0</td></tr>
+                <tr><td style="padding:2px 4px;border:1px solid #F0D98A;text-align:left;color:#5A7472;">설치/시운전</td><td style="padding:2px 4px;border:1px solid #F0D98A;">100%</td><td style="padding:2px 4px;border:1px solid #F0D98A;">1.0</td></tr>
+              </tbody>
+            </table>
+            <div style="background:#FEF8EC;border:1px solid #F0D98A;border-radius:5px;padding:4px 7px;font-size:10.5px;line-height:1.7;color:#3A3A3A;">
+              42% × 0.9 = <strong>37.8%</strong> &nbsp;·&nbsp; Min(40%, 37.8%) = <strong>37.8%</strong> &nbsp;·&nbsp; $5M × 37.8% = <strong style="color:#7A5200;">$1,890,000</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. JV 현장 투입 산출 -->
+      <div class="factor-card factor-card--3" onmouseenter="flipCard(this)" onmouseleave="unflipCard(this)">
+        <div class="factor-front">
+          
+          <div class="factor-name">JV 현장<br>투입 산출</div>
+          <div class="factor-hint">커서를 올려 상세 보기 →</div>
+        </div>
+        <div class="factor-back">
+          <div class="factor-back__title">JV 현장 투입 산출</div>
+          <div class="factor-back__body" style="font-size:11.5px;">
+            <div style="margin-bottom:7px;padding-bottom:7px;border-bottom:1px solid #E4EFED;line-height:1.65;">
+              전체 JV 투입비를 <strong>당사 지분율만큼 배부</strong>하고, 여기에 <strong>당사 단독 투입분을 추가</strong>하여 최종 투입 원가가 산출됩니다.
+            </div>
+            <div style="font-size:10.5px;color:#5A7472;margin-bottom:4px;">예) 현대건설 60% · 삼성물산 40% · JV 합계 100억 투입</div>
+            <table style="width:100%;border-collapse:collapse;font-size:9.5px;text-align:center;margin-bottom:6px;">
+              <thead><tr style="background:#FEF8EC;">
+                <th style="padding:2px 3px;border:1px solid #F0D98A;color:#7A5200;">구분</th>
+                <th style="padding:2px 3px;border:1px solid #F0D98A;color:#7A5200;">지분율</th>
+                <th style="padding:2px 3px;border:1px solid #F0D98A;color:#7A5200;">JV 배부</th>
+                <th style="padding:2px 3px;border:1px solid #F0D98A;color:#7A5200;">단독 투입</th>
+                <th style="padding:2px 3px;border:1px solid #F0D98A;color:#7A5200;">최종 인식</th>
+              </tr></thead>
+              <tbody>
+                <tr>
+                  <td style="padding:2px 3px;border:1px solid #F0D98A;">현대건설</td>
+                  <td style="padding:2px 3px;border:1px solid #F0D98A;">60%</td>
+                  <td style="padding:2px 3px;border:1px solid #F0D98A;">60억</td>
+                  <td style="padding:2px 3px;border:1px solid #F0D98A;">20억</td>
+                  <td style="padding:2px 3px;border:1px solid #F0D98A;font-weight:700;color:#7A5200;">80억</td>
+                </tr>
+                <tr>
+                  <td style="padding:2px 3px;border:1px solid #F0D98A;">삼성물산</td>
+                  <td style="padding:2px 3px;border:1px solid #F0D98A;">40%</td>
+                  <td style="padding:2px 3px;border:1px solid #F0D98A;">40억</td>
+                  <td style="padding:2px 3px;border:1px solid #F0D98A;">5억</td>
+                  <td style="padding:2px 3px;border:1px solid #F0D98A;font-weight:700;color:#7A5200;">45억</td>
+                </tr>
+              </tbody>
+            </table>
+            <div style="background:#E6F4F2;border-radius:7px;padding:6px 9px;font-size:11px;line-height:1.6;color:#1A2E2C;">
+              JV 배부액 + <strong>당사 단독 투입분</strong> = 최종 인식 원가
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. 기간인식 비용 관리 -->
+      <div class="factor-card factor-card--1" onmouseenter="flipCard(this)" onmouseleave="unflipCard(this)">
+        <div class="factor-front">
+          
+          <div class="factor-name">기간인식<br>비용 관리</div>
+          <div class="factor-hint">커서를 올려 상세 보기 →</div>
+        </div>
+        <div class="factor-back">
+          <div class="factor-back__title">기간인식 비용 관리</div>
+          <div class="factor-back__body" style="font-size:11.5px;">
+            <div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #E4EFED;line-height:1.65;">
+              공사 보험료나 선급 임차료 등 지불되는 시점에 전액 비용으로 인식하지 않고 보험 기간이나 임차 기간에 걸쳐 <strong>안분하여 인식</strong>하는 비용들이 있습니다.<br>
+              이렇게 기간에 따라 인식하는 비용들은 결산 시 <strong>특히 주의가 필요</strong>합니다.
+            </div>
+            <div style="background:#FEF0F0;border:1px solid #F5C6C6;border-radius:7px;padding:7px 10px;font-size:11px;line-height:1.7;color:#1A2E2C;margin-bottom:8px;">
+              <strong style="color:#D93B3B;">✕ 잘못된 처리</strong><br>
+              보험료 12억 납부 → 당월에 12억 전액 비용 처리
+            </div>
+            <div style="background:#E6F4F2;border-radius:7px;padding:7px 10px;font-size:11px;line-height:1.7;color:#1A2E2C;">
+              <strong style="color:#005C52;">✓ 올바른 처리</strong><br>
+              공사기간 24개월 기준 → 매월 <strong>0.5억씩 안분</strong> 인식
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. 하자보수비·금융비용 -->
+      <div class="factor-card factor-card--3" style="--card-color:#6B3A8C;" onmouseenter="flipCard(this)" onmouseleave="unflipCard(this)">
+        <div class="factor-front" style="background:linear-gradient(135deg,#1A5276,#2980B9);">
+          
+          <div class="factor-name">하자보수비<br>·금융비용</div>
+          <div class="factor-hint">커서를 올려 상세 보기 →</div>
+        </div>
+        <div class="factor-back" style="border-color:#2980B9;">
+          <div class="factor-back__title">하자보수비 · 금융비용</div>
+          <div class="factor-back__body" style="font-size:11.5px;">
+            <div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #E4EFED;line-height:1.65;">
+              진행률(매출) 계산 시에는 <strong>제외</strong>되지만, 최종 이익(원가) 산정에는 <strong>반드시 포함</strong>되어야 합니다.
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
+              <div style="background:#FEF0F0;border:1px solid #F5C6C6;border-radius:7px;padding:6px 8px;font-size:11px;text-align:center;line-height:1.6;">
+                <div style="font-weight:700;color:#D93B3B;margin-bottom:2px;">진행률 산출</div>
+                <div style="color:#5A7472;">하자·금융비용<br><strong style="color:#D93B3B;">제외</strong></div>
+              </div>
+              <div style="background:#E6F4F2;border:1px solid #C8DDD9;border-radius:7px;padding:6px 8px;font-size:11px;text-align:center;line-height:1.6;">
+                <div style="font-weight:700;color:#005C52;margin-bottom:2px;">원가 산정</div>
+                <div style="color:#5A7472;">하자·금융비용<br><strong style="color:#005C52;">포함</strong></div>
+              </div>
+            </div>
+            <div style="margin-bottom:6px;font-size:11px;font-weight:700;color:#1A2E2C;">💡 금융비용 산정 방식</div>
+            <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:8px;">
+              <div style="background:#F0F4FF;border:1px solid #C5D0EE;border-radius:7px;padding:6px 9px;font-size:11px;line-height:1.6;color:#1A2E2C;">
+                <strong style="color:#1A5276;">착공 전 발생 금융비용</strong> : 진행률에 비례하여 누적 인식
+              </div>
+              <div style="background:#F5F0FF;border:1px solid #D0C5EE;border-radius:7px;padding:6px 9px;font-size:11px;line-height:1.6;color:#1A2E2C;">
+                <strong style="color:#6B3A8C;">착공 후 발생 금융비용</strong> : 실제 발생 금액 기준으로 인식
+              </div>
+            </div>
+            <div style="background:#E6F4F2;border-radius:7px;padding:6px 9px;font-size:11px;line-height:1.6;color:#1A2E2C;">
+              누락 시 매출이익이 <strong>과대 계상</strong>될 수 있으니 반드시 확인하세요.
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /factor-grid -->
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SECTION 3 : 시뮬레이터
+  ══════════════════════════════════════════ -->
+  <div class="section-block">
+    <div class="section-intro">🏗️ 현장 실적 시뮬레이터</div>
+    <div style="font-size:14px;font-weight:700;color:var(--muted);margin-bottom:10px;margin-top:-10px;">이제 근무하시는 현장의 매출을 구해볼까요?</div>
+    <div style="font-size:12px;color:#5A7472;line-height:1.7;background:#F2F7F6;border-radius:8px;padding:10px 14px;border:1px solid var(--border-light);margin-bottom:16px;">
+      ※ 본 시뮬레이터는 결산 로직을 약식으로 구현한 시뮬레이터로, 실제 결산 시 숫자와는 약간의 차이가 있을 수 있습니다.
+    </div>
+
+    <div class="layout">
 
     <!-- ── 입력 카드 ── -->
     <div class="card card-input">
@@ -343,7 +891,7 @@
 
       <!-- 공사원가율 (자동) -->
       <div class="field" data-lbl="D">
-        <label><b style="color:var(--teal);">D</b> &nbsp;공사원가율 (%) <span style="font-weight:400;color:#9ab;">(하자, 금융비용 제외)</span><span class="badge-tag badge-auto">자동 산출</span></label>
+        <label><b style="color:var(--teal);">D</b> &nbsp;매출원가율 − 하자보수비율 − 금융비용 (%)<span class="badge-tag badge-auto">자동 산출</span></label>
         <div class="input-row">
           <span class="unit">%</span>
           <input type="text" id="constR_disp" class="auto" readonly tabindex="-1">
@@ -367,8 +915,9 @@
         <label>착공 전 금융비용 (원)</label>
         <div class="input-row">
           <span class="unit">원</span>
-          <input type="text" id="etcPreAmt" placeholder="0" oninput="fmt(this);calc()">
+          <input type="text" id="etcPreAmt" placeholder="0" oninput="fmt(this);capEtc('pre');calc()">
         </div>
+        <div id="etcPreMsg" style="font-size:11px;color:var(--danger);margin-top:3px;display:none;">⚠️ 금융비용 한도를 초과하여 한도액으로 조정되었습니다.</div>
       </div>
 
       <!-- 착공 후 금융비용 -->
@@ -376,8 +925,9 @@
         <label>착공 후 금융비용 (당월말 누계)</label>
         <div class="input-row">
           <span class="unit">원</span>
-          <input type="text" id="etcPostAmt" placeholder="0" oninput="fmt(this);calc()">
+          <input type="text" id="etcPostAmt" placeholder="0" oninput="fmt(this);capEtc('post');calc()">
         </div>
+        <div id="etcPostMsg" style="font-size:11px;color:var(--danger);margin-top:3px;display:none;">⚠️ 금융비용 한도를 초과하여 한도액으로 조정되었습니다.</div>
       </div>
 
       <hr class="divider">
@@ -553,199 +1103,25 @@
       </div>
     </div><!-- /결과 카드 -->
 
-  </div><!-- /layout -->
+    </div><!-- /layout -->
+  </div><!-- /section-block 시뮬레이터 -->
 
-  <div style="margin-top:20px;padding:14px 20px;background:#FEF8EC;border:1px solid #F0D98A;border-left:4px solid #E6A817;border-radius:12px;color:#1A2E2C;display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
-    <div style="font-weight:700;font-size:14px;color:#7A5200;white-space:nowrap;">⚠️ 위 시뮬레이터 외 결산 추가 고려 사항</div>
-    <ul style="margin:0;padding-left:18px;font-size:13px;line-height:1.9;color:#3A3A3A;display:flex;gap:24px;list-style:disc;flex-wrap:wrap;">
-      <li>
-        <span class="tooltip-trigger" data-tooltip="jajae" style="cursor:pointer;color:#7A5200;font-weight:600;text-decoration:underline;text-underline-offset:3px;">제작기자재</span>
-      </li>
-      <li>
-        <span class="tooltip-trigger" data-tooltip="jv" style="cursor:pointer;color:#7A5200;font-weight:600;text-decoration:underline;text-underline-offset:3px;">JV 현장 투입</span>
-      </li>
-    </ul>
+  <div style="margin-top:16px;font-size:12px;color:var(--muted);text-align:center;border-top:1px solid var(--border-light);padding-top:12px;">
+    본 시뮬레이션은 공지용 간이 도구이며, 실제 결산 수치는 시스템(ERP) 기준을 따릅니다.
   </div>
-</div>
 
-<!-- 툴팁 카드 (공통) -->
-<div id="tooltip-card" style="
-  display:none;
-  position:fixed;
-  z-index:9999;
-  width:560px;
-  background:#fff;
-  border:1px solid #F0D98A;
-  border-top:3px solid #E6A817;
-  border-radius:12px;
-  padding:12px 16px;
-  box-shadow:0 8px 28px rgba(0,0,0,0.15);
-  font-size:13px;
-  line-height:1.5;
-  color:#3A3A3A;
-  pointer-events:auto;
-">
-  <div id="tooltip-title" style="font-weight:700;font-size:13.5px;color:#7A5200;margin-bottom:8px;"></div>
-  <div id="tooltip-body"></div>
-</div>
+</div><!-- /container -->
 
 <script>
-  const tooltipContents = {
-    jajae: {
-      title: '제작기자재',
-      body: `
-        <div style="margin-bottom:8px;">
-          <div style="font-weight:700;font-size:11px;color:#7A5200;margin-bottom:3px;text-transform:uppercase;letter-spacing:0.04em;">적용 조건</div>
-          <div style="font-size:12.5px;color:#3A3A3A;line-height:1.6;">
-            제작 건당 <strong>$5백만불 이상</strong>, 제작기간 <strong>1년 이상</strong> 기자재
-            <span style="color:#888;font-size:11.5px;">&nbsp;(Bulk 자재 제외)</span>
-          </div>
-        </div>
-        <div style="border-top:1px solid #F0D98A;padding-top:8px;margin-bottom:8px;">
-          <div style="font-weight:700;font-size:11px;color:#7A5200;margin-bottom:3px;text-transform:uppercase;letter-spacing:0.04em;">결산 반영</div>
-          <div style="font-size:12.5px;color:#3A3A3A;line-height:1.6;">
-            제작기자재 총 금액 &times;
-            <span style="background:#FEF8EC;border:1px solid #F0D98A;border-radius:6px;padding:2px 8px;display:inline-block;margin-top:3px;font-size:12px;white-space:nowrap;">
-              Min( 단계별 상한 공정률, 제작공정률 &times; 단계별 가중치 )
-            </span>
-          </div>
-        </div>
-        <div style="border-top:1px solid #F0D98A;padding-top:8px;">
-          <div style="font-weight:700;font-size:11px;color:#7A5200;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.04em;">예시</div>
-          <div style="font-size:12px;color:#555;margin-bottom:6px;line-height:1.6;">
-            총 계약금액 <strong>$5백만불</strong> · 원자재 확보 완료 · 제작공정률 <strong>42%</strong>
-          </div>
-          <table style="width:100%;border-collapse:collapse;font-size:11.5px;text-align:center;margin-bottom:8px;">
-            <thead>
-              <tr style="background:#FEF8EC;">
-                <th style="padding:4px 6px;border:1px solid #F0D98A;color:#7A5200;font-weight:700;">단계</th>
-                <th style="padding:4px 6px;border:1px solid #F0D98A;color:#7A5200;font-weight:700;">상한 공정률</th>
-                <th style="padding:4px 6px;border:1px solid #F0D98A;color:#7A5200;font-weight:700;">가중치</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td style="padding:4px 6px;border:1px solid #F0D98A;border-bottom:1px solid #E6A817;text-align:left;">도면 승인</td><td style="padding:4px 6px;border:1px solid #F0D98A;border-bottom:1px solid #E6A817;">20%</td><td style="padding:4px 6px;border:1px solid #F0D98A;border-bottom:1px solid #E6A817;">0.9</td></tr>
-              <tr style="background:#FEF8EC;font-weight:700;">
-                <td style="padding:4px 6px;border:1px solid #E6A817;text-align:left;color:#7A5200;">✓ 원자재 확보</td>
-                <td style="padding:4px 6px;border:1px solid #E6A817;color:#7A5200;">40%</td>
-                <td style="padding:4px 6px;border:1px solid #E6A817;color:#7A5200;">0.9</td>
-              </tr>
-              <tr><td style="padding:4px 6px;border:1px solid #F0D98A;border-top:1px solid #E6A817;text-align:left;">중간 제작 검수</td><td style="padding:4px 6px;border:1px solid #F0D98A;border-top:1px solid #E6A817;">70%</td><td style="padding:4px 6px;border:1px solid #F0D98A;border-top:1px solid #E6A817;">0.9</td></tr>
-              <tr><td style="padding:4px 6px;border:1px solid #F0D98A;text-align:left;">최종 제작 검수</td><td style="padding:4px 6px;border:1px solid #F0D98A;">80%</td><td style="padding:4px 6px;border:1px solid #F0D98A;">0.9</td></tr>
-              <tr><td style="padding:4px 6px;border:1px solid #F0D98A;text-align:left;">제작국 선적</td><td style="padding:4px 6px;border:1px solid #F0D98A;">90%</td><td style="padding:4px 6px;border:1px solid #F0D98A;">1.0</td></tr>
-              <tr><td style="padding:4px 6px;border:1px solid #F0D98A;text-align:left;">현장 도착</td><td style="padding:4px 6px;border:1px solid #F0D98A;">95%</td><td style="padding:4px 6px;border:1px solid #F0D98A;">1.0</td></tr>
-              <tr><td style="padding:4px 6px;border:1px solid #F0D98A;text-align:left;">설치/시운전 완료</td><td style="padding:4px 6px;border:1px solid #F0D98A;">100%</td><td style="padding:4px 6px;border:1px solid #F0D98A;">1.0</td></tr>
-            </tbody>
-          </table>
-          <div style="background:#FEF8EC;border:1px solid #F0D98A;border-radius:8px;padding:8px 12px;font-size:12px;line-height:1.8;color:#3A3A3A;">
-            제작공정률 42% &times; 가중치 0.9 = <strong>37.8%</strong><br>
-            Min( 상한 40%, 37.8% ) = <strong>37.8%</strong><br>
-            인식 금액 = $5백만불 &times; 37.8% = <strong style="color:#007A6E;">$1,890,000</strong>
-          </div>
-        </div>
-      `
-    },
-    jv: {
-      title: 'JV 현장 투입',
-      body: `
-        <div style="margin-bottom:8px;">
-          <div style="font-weight:700;font-size:11px;color:#7A5200;margin-bottom:3px;text-transform:uppercase;letter-spacing:0.04em;">JV (Joint Venture)</div>
-          <div style="font-size:12.5px;color:#3A3A3A;line-height:1.6;">
-            두 개 이상의 건설사가 한시적으로 결성하는 <strong>공동 수급체</strong>
-          </div>
-        </div>
-        <div style="border-top:1px solid #F0D98A;padding-top:8px;margin-bottom:8px;">
-          <div style="font-weight:700;font-size:11px;color:#7A5200;margin-bottom:3px;text-transform:uppercase;letter-spacing:0.04em;">결산 반영</div>
-          <div style="font-size:12.5px;color:#3A3A3A;line-height:1.6;">
-            주간사 JV 계좌에 각 사 투입 취합 후 <strong>지분율 비례 각 사에 배분</strong>
-          </div>
-        </div>
-        <div style="border-top:1px solid #F0D98A;padding-top:8px;">
-          <div style="font-weight:700;font-size:11px;color:#7A5200;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.04em;">예시</div>
-          <div style="font-size:12px;color:#555;margin-bottom:6px;line-height:1.6;">
-            현대건설 <strong>60%</strong> · 삼성물산 <strong>40%</strong> 공사 수행 시,<br>
-            해당 월말 누계 투입: 현대건설 <strong>80억</strong> + 삼성물산 <strong>20억</strong> = 합계 <strong>100억</strong>
-          </div>
-          <table style="width:100%;border-collapse:collapse;font-size:12px;text-align:center;">
-            <thead>
-              <tr style="background:#FEF8EC;">
-                <th style="padding:5px 8px;border:1px solid #F0D98A;color:#7A5200;font-weight:700;">구분</th>
-                <th style="padding:5px 8px;border:1px solid #F0D98A;color:#7A5200;font-weight:700;">지분율</th>
-                <th style="padding:5px 8px;border:1px solid #F0D98A;color:#7A5200;font-weight:700;">합계 투입</th>
-                <th style="padding:5px 8px;border:1px solid #F0D98A;color:#7A5200;font-weight:700;">인식 금액</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td style="padding:5px 8px;border:1px solid #F0D98A;color:#3A3A3A;">현대건설</td>
-                <td style="padding:5px 8px;border:1px solid #F0D98A;">60%</td>
-                <td style="padding:5px 8px;border:1px solid #F0D98A;" rowspan="2">100억</td>
-                <td style="padding:5px 8px;border:1px solid #F0D98A;font-weight:700;color:#007A6E;">60억</td>
-              </tr>
-              <tr>
-                <td style="padding:5px 8px;border:1px solid #F0D98A;color:#3A3A3A;">삼성물산</td>
-                <td style="padding:5px 8px;border:1px solid #F0D98A;">40%</td>
-                <td style="padding:5px 8px;border:1px solid #F0D98A;font-weight:700;color:#007A6E;">40억</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      `
-    }
-  };
-
-  const tooltipCard = document.getElementById('tooltip-card');
-  const tooltipTitle = document.getElementById('tooltip-title');
-  const tooltipBody  = document.getElementById('tooltip-body');
-  let activeTooltip  = null;
-
-  document.querySelectorAll('.tooltip-trigger').forEach(trigger => {
-    trigger.addEventListener('click', function(e) {
-      e.stopPropagation();
-      const key = this.dataset.tooltip;
-
-      // 같은 항목 클릭 시 닫기
-      if (activeTooltip === key && tooltipCard.style.display === 'block') {
-        tooltipCard.style.display = 'none';
-        activeTooltip = null;
-        return;
-      }
-
-      activeTooltip = key;
-      const content = tooltipContents[key];
-      tooltipTitle.textContent = content.title;
-      tooltipBody.innerHTML = content.body;
-
-      // 위치 계산: 클릭한 요소 기준
-      const rect = this.getBoundingClientRect();
-      tooltipCard.style.display = 'block';
-
-      const cardW = 280;
-      const cardH = tooltipCard.offsetHeight;
-      const margin = 10;
-      const vpW = window.innerWidth;
-      const vpH = window.innerHeight;
-
-      let left = rect.right + margin;
-      let top  = rect.top;
-
-      // 오른쪽 공간 부족 시 왼쪽으로
-      if (left + cardW > vpW - margin) left = rect.left - cardW - margin;
-      // 아래쪽 공간 부족 시 위로 올리기
-      if (top + cardH > vpH - margin) top = vpH - cardH - margin;
-      if (top < margin) top = margin;
-
-      tooltipCard.style.left = left + 'px';
-      tooltipCard.style.top  = top  + 'px';
-    });
-  });
-
-  // 바깥 클릭 시 닫기
-  document.addEventListener('click', function() {
-    tooltipCard.style.display = 'none';
-    activeTooltip = null;
-  });
-  tooltipCard.addEventListener('click', e => e.stopPropagation());
+  function flipCard(el) {
+    el.classList.remove('unflipping');
+    el.classList.add('flipped');
+  }
+  function unflipCard(el) {
+    el.classList.remove('flipped');
+    el.classList.add('unflipping');
+    setTimeout(() => el.classList.remove('unflipping'), 500);
+  }
 </script>
 
 <script>
@@ -779,6 +1155,38 @@
     const el = $(id); if (!el) return;
     el.textContent = fp(val) + "%";
     el.className = val >= 0 ? "pos" : "neg";
+  }
+
+  function capEtc(which) {
+    const contract  = n($("contract").value);
+    const etcTotalR = n($("etcTotalR").value);
+    const limit     = contract * (etcTotalR / 100);
+
+    const preEl   = $("etcPreAmt");
+    const postEl  = $("etcPostAmt");
+    const preMsg  = $("etcPreMsg");
+    const postMsg = $("etcPostMsg");
+
+    preMsg.style.display  = "none";
+    postMsg.style.display = "none";
+
+    if (contract <= 0 || limit <= 0) return;
+
+    if (which === 'pre') {
+      const pre = n(preEl.value);
+      if (pre > limit) {
+        preEl.value = Math.round(limit).toLocaleString();
+        preMsg.style.display = "block";
+      }
+    } else {
+      const pre  = n(preEl.value);
+      const post = n(postEl.value);
+      const maxPost = Math.max(0, limit - pre);
+      if (post > maxPost) {
+        postEl.value = Math.round(maxPost).toLocaleString();
+        postMsg.style.display = "block";
+      }
+    }
   }
 
   function calc() {
@@ -922,16 +1330,28 @@
 
     const lossEl = $("lossSection");
     const msgEl  = $("msg");
+
+    /* 금융비용 초과 여부 */
+    const etcTotal     = etcPreAmt + etcPostAmt;
+    const etcOverrun   = contract > 0 && etcTotal > eac_etc;
+
     if (isLoss) {
       lossEl.style.display = "block";
-      $("lossTotal").textContent = f(totalLoss)  ;
+      $("lossTotal").textContent = f(totalLoss);
       $("lossRec").textContent   = f(recognized);
-      $("lossAmt").textContent   = f(provision)  ;
+      $("lossAmt").textContent   = f(provision);
+      msgEl.style.display = "";
       msgEl.className = "alert warn";
-      msgEl.innerHTML = "⚠️ <b>실행원가율 100% 초과:</b> 손실 현장입니다. 공사손실충당금 계상이 필요합니다.";
+      msgEl.innerHTML = "⚠️ <b>실행원가율 100% 초과:</b> 손실 현장입니다. 공사손실충당금 계상이 필요합니다."
+        + (etcOverrun ? `<br>⚠️ <b>금융비용 초과:</b> 실제 금융비용(${f(etcTotal)}원)이 목표 금융비용(${f(eac_etc)}원)을 초과합니다.` : "");
     } else {
       lossEl.style.display = "none";
-      if (contract > 0) {
+      if (etcOverrun) {
+        msgEl.style.display = "";
+        msgEl.className = "alert warn";
+        msgEl.innerHTML = `⚠️ <b>금융비용 초과:</b> 실제 금융비용(${f(etcTotal)}원)이 목표 금융비용(${f(eac_etc)}원)을 초과합니다.`;
+      } else if (contract > 0) {
+        msgEl.style.display = "";
         msgEl.className = "alert info";
         msgEl.innerHTML = "✅ <b>정상 현장:</b> 도급 범위 내에서 원가가 관리되고 있습니다.";
       } else {
